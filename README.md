@@ -1,8 +1,8 @@
-# Antigravity Proxy Installer (`antigravity-patcher`)
+# GravProxy (`grav-proxy`)
 
 Портативный однофайловый установщик локального прокси (`127.0.0.1:28080`) и локального PAC-маршрутизатора (`127.0.0.1:28081`) на базе `sing-box` для **Antigravity IDE**, **v0.app**, **Gemini Desktop**, **NotebookLM** и **OpenCode Desktop / CLI** на Windows 10/11 x64.
 
-Репозиторий содержит готовый автономный исполняемый файл [`Antigravity-Proxy-Installer.exe`](./Antigravity-Proxy-Installer.exe) без необходимости ручной сборки.
+Репозиторий содержит готовый автономный исполняемый файл [`GravProxy.exe`](./GravProxy.exe) ([скачать последний релиз](https://github.com/qlfu/grav-proxy/releases/latest)) без необходимости ручной сборки.
 
 ---
 
@@ -38,7 +38,7 @@
 
 ## Установка и использование (GUI)
 
-1. Скачайте [`Antigravity-Proxy-Installer.exe`](./Antigravity-Proxy-Installer.exe) и запустите двойным кликом.
+1. Скачайте [`GravProxy.exe`](./GravProxy.exe) (или со страницы [Releases](https://github.com/qlfu/grav-proxy/releases/latest)) и запустите двойным кликом.
 2. **Прокси-сервер (VLESS / Happ)**:
    - Оставьте поле пустым — установщик сам использует найденный ключ/подписку (`AG_PROXY_VLESS`, `AG_PROXY_SUB_URL` или Happ), или нажмите **«Найти в Happ»** для принудительного поиска в Happ.
    - При необходимости вставьте вручную ссылку `vless://...` или `https://...` подписку (например, если Happ хранит подписку только в зашифрованном `subs.db` и в логах её нет).
@@ -66,23 +66,23 @@
 
 ## Режим командной строки (CLI)
 
-При передаче любых аргументов [`Antigravity-Proxy-Installer.exe`](./Antigravity-Proxy-Installer.exe) запускается в консольном режиме.
+При передаче любых аргументов [`GravProxy.exe`](./GravProxy.exe) запускается в консольном режиме.
 
 ### Примеры
 
 ```powershell
 # Полная установка в автоматическом режиме
-.\Antigravity-Proxy-Installer.exe -Cli
+.\GravProxy.exe -Cli
 
 # Установка с явным ключом или подпиской
-.\Antigravity-Proxy-Installer.exe -VlessUrl "vless://..."
-.\Antigravity-Proxy-Installer.exe -SubUrl "https://example.com/sub"
+.\GravProxy.exe -VlessUrl "vless://..."
+.\GravProxy.exe -SubUrl "https://example.com/sub"
 
 # Повторный патч Antigravity, OpenCode-сервиса и ярлыков
-.\Antigravity-Proxy-Installer.exe -PatchOnly
+.\GravProxy.exe -PatchOnly
 
 # Полное удаление и откат
-.\Antigravity-Proxy-Installer.exe -Uninstall
+.\GravProxy.exe -Uninstall
 ```
 
 ### Поддерживаемые флаги
