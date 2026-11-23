@@ -1,6 +1,6 @@
 # GravProxy (`grav-proxy`)
 
-Портативный однофайловый установщик локального прокси (`127.0.0.1:28080`) и локального PAC-маршрутизатора (`127.0.0.1:28081`) на базе `sing-box` для **Antigravity IDE**, **v0.app**, **Gemini Desktop**, **NotebookLM** и **OpenCode Desktop / CLI** на Windows 10/11 x64.
+Портативный однофайловый установщик локального прокси (`127.0.0.1:28080`) и локального PAC-маршрутизатора (`127.0.0.1:28081`) на базе `sing-box` для **Antigravity IDE**, **v0.app**, **Gemini Desktop**, **NotebookLM**, **OpenCode Desktop / CLI** и **Claude Code** на Windows 10/11 x64.
 
 Репозиторий содержит готовый автономный исполняемый файл [`GravProxy.exe`](./GravProxy.exe) ([скачать последний релиз](https://github.com/qlfu/grav-proxy/releases/latest)) без необходимости ручной сборки.
 
@@ -18,9 +18,13 @@
   - Проверяет и автоматически перепатчивает бинарники и ярлыки при каждом запуске и по таймеру из трея.
 - **v0.app, Gemini Desktop и NotebookLM через локальный PAC**:
   - Поднимает локальный PAC-сервер `http://127.0.0.1:28081/proxy.pac` и прописывает его в WinINet без создания отдельного профиля браузера.
-  - Направляет через прокси нужные домены (`v0.app`, `vercel.*`, `gemini.google.com`, `geminiweb-pa.*`, `notebooklm.google.com`, `notebook.google.com`, `labs.google`, `cloudcode-pa.googleapis.com`, `opencode.ai`, `openrouter.ai`, `api.openai.com`, `api.anthropic.com` и др.), остальные сайты идут `DIRECT` (или через внешний системный прокси, если он был включён до установки). Официальное приложение **Gemini Desktop** (`Gemini.exe`) нативно использует системный PAC без патчинга бинарника (с сохранением `Alt+Space` и автообновлений).
+  - Направляет через прокси нужные домены (`v0.app`, `vercel.*`, `gemini.google.com`, `geminiweb-pa.*`, `notebooklm.google.com`, `notebook.google.com`, `labs.google`, `cloudcode-pa.googleapis.com`, `opencode.ai`, `openrouter.ai`, `api.openai.com`, `api.anthropic.com`, `anthropic.com`, `claude.ai`, `claude.com` и др.), остальные сайты идут `DIRECT` (или через внешний системный прокси, если он был включён до установки). Официальное приложение **Gemini Desktop** (`Gemini.exe`) нативно использует системный PAC без патчинга бинарника (с сохранением `Alt+Space` и автообновлений).
+- **Claude Code (API-ключ без входа в аккаунт Anthropic + прокси)**:
+  - Записывает `HTTP_PROXY` / `HTTPS_PROXY` (`http://127.0.0.1:28080`) и `NO_PROXY` в `%USERPROFILE%\.claude\settings.json` (работает и для CLI, и для расширений VS Code / Cursor / Antigravity) с сохранением уже настроенных параметров и `apiKeyHelper`.
+  - При указании API-ключа (`sk-ant-...`, `sk-or-...` для OpenRouter или совместимого шлюза через `Base URL`) автоматически настраивает ключ, выставляет `hasCompletedOnboarding: true` и подтверждает ключ в `%USERPROFILE%\.claude.json`, позволяя работать без авторизации в аккаунте Anthropic.
+  - Добавляет обёртку `claude.cmd` (`claude-proxy.cmd`) в `PATH` для гарантированного запуска CLI через локальный прокси.
 - **Управление из системного трея (`proxy-tray.exe`)**:
-  - Цветовая индикация статуса (`активен` / `выключен` / `запуск` / `ошибка`), включение/выключение прокси (при паузе PAC переходит в `DIRECT`), автоматическое переключение на запасной чистый сервер при сбое узла или блокировке Google GeoIP (с переключателем в меню трея), быстрый подбор чистого сервера вручную, диагностика подключения, перепатч, открытие `proxy.log` и папки установки.
+  - Цветовая индикация статуса (`активен` / `выключен` / `запуск` / `ошибка`), включение/выключение прокси (при паузе PAC переходит в `DIRECT`), автоматическое переключение на запасной чистый сервер при сбое узла или блокировке Google GeoIP (с переключателем в меню трея), быстрый подбор чистого сервера вручную, диагностика подключения, перепатч, быстрый запуск приложений (включая **«Открыть Claude Code»**), открытие `proxy.log` и папки установки.
 - **Очистка конфликтующих обходов при установке**: автоматически находит и убирает мешающие DNS/NRPT-правила, задачи планировщика, фоновый `ag_dns.exe` (например, от `AG Unlocker`), устаревший профиль `v0-chrome` и конфликтующие записи AI-доменов в `hosts` (не затрагивая сторонние записи GitHub/Telegram/Discord и обычный `Unlocker 1.9.2`); системный UAC запрашивается только при наличии таких конфликтов.
 - **Работа без прав администратора**: установка в `%LOCALAPPDATA%\ag-proxy` и автозапуск через `HKCU\Software\Microsoft\Windows\CurrentVersion\Run`.
 - **Чистое удаление и откат**: автоматически закрывает блокирующие процессы, возвращает оригинальные бинарники Antigravity и исходные ярлыки, восстанавливает прежний `AutoConfigURL`, очищает `PATH` и переменные `AG_PROXY_*`.
@@ -47,8 +51,9 @@
    - `Antigravity IDE` — патч на месте и автоперепатч через ярлык.
    - `v0.app, Gemini Desktop и NotebookLM (PAC)` — системный PAC-маршрут для Chrome / Edge и приложения Gemini Desktop.
    - `OpenCode Desktop и CLI` — настройка ярлыка, фонового сервиса OpenCode и команд `opencode` / `oc` в `PATH`.
+   - `Claude Code (API-ключ и прокси)` — настройка `~/.claude/settings.json` и `~/.claude.json`, пропуск входа Anthropic, опциональный ввод API-ключа и `Base URL`, обёртка `claude` в `PATH`.
 4. Нажмите **«Установить»** (или **«Обновить»** при повторном запуске).
-5. Для проверки доступности сервисов нажмите **«Проверить»** — откроется вкладка **«Журнал»** со статусом внешнего IP, Google GeoIP, Antigravity, v0.app, Gemini, NotebookLM, OpenCode и OpenRouter.
+5. Для проверки доступности сервисов нажмите **«Проверить»** — откроется вкладка **«Журнал»** со статусом внешнего IP, Google GeoIP, Antigravity, v0.app, Gemini, NotebookLM, OpenCode, OpenRouter и Claude / Anthropic API.
 
 > Горячие действия: в верхней панели доступна смена темы (`Авто` / `Светлая` / `Тёмная`), по клавише `Esc` окно закрывается (если установка сейчас не выполняется).
 
@@ -57,7 +62,7 @@
 ## Использование после установки
 
 - **Antigravity IDE** и **OpenCode Desktop**: запускайте через привычные ярлыки на Рабочем столе, в меню «Пуск» или на панели задач.
-- **OpenCode CLI**: откройте новый терминал и используйте `opencode`, `oc` или `opencode-proxy`.
+- **OpenCode CLI** и **Claude Code CLI**: откройте новый терминал и используйте `opencode`, `oc`, `opencode-proxy` или `claude` / `claude-proxy` (либо пункт **«Открыть Claude Code»** в меню трея).
 - **Gemini Desktop**: запускайте официальный ярлык или `Alt+Space` как обычно (при включённом прокси приложение само идёт через системный PAC `:28081`).
 - **v0.app** и **NotebookLM**: откройте https://v0.app или https://notebooklm.google.com в обычном Chrome или Edge при запущенном прокси.
 - **Свои домены в PAC**: создайте файл `%LOCALAPPDATA%\ag-proxy\pac-domains.txt` (по одному домену в строке, строки с `#` игнорируются) — изменения подхватятся автоматически.
@@ -78,8 +83,12 @@
 .\GravProxy.exe -VlessUrl "vless://..."
 .\GravProxy.exe -SubUrl "https://example.com/sub"
 
-# Повторный патч Antigravity, OpenCode-сервиса и ярлыков
+# Повторный патч Antigravity, OpenCode-сервиса, Claude Code и ярлыков
 .\GravProxy.exe -PatchOnly
+
+# Установка с настройкой Claude Code по API-ключу
+.\GravProxy.exe -Cli -ClaudeApiKey "sk-ant-..."
+.\GravProxy.exe -Cli -ClaudeApiKey "sk-or-v1-..." -ClaudeBaseUrl "https://openrouter.ai/api"
 
 # Полное удаление и откат
 .\GravProxy.exe -Uninstall
@@ -92,13 +101,16 @@
 | `-TargetRoot <путь>` | Каталог установки (по умолчанию `%LOCALAPPDATA%\ag-proxy`) |
 | `-VlessUrl <url>` | Ссылка `vless://...` или URL подписки `https://...` |
 | `-SubUrl <url>` | URL подписки `https://...` с автоподбором чистого сервера Google GeoIP |
-| `-PatchOnly` | Только перепатчить Antigravity / ярлыки / PAC / OpenCode-сервис |
+| `-ClaudeApiKey <key>` | API-ключ Claude Code (`sk-ant-...` или `sk-or-...` для OpenRouter) |
+| `-ClaudeBaseUrl <url>` | Свой `ANTHROPIC_BASE_URL` для Claude Code (по умолчанию официальный или OpenRouter) |
+| `-PatchOnly` | Только перепатчить Antigravity / ярлыки / PAC / OpenCode-сервис / Claude Code |
 | `-Uninstall` | Закрыть мешающие процессы, вернуть оригиналы и удалить установку |
 | `-SkipTray` | Не собирать и не запускать `proxy-tray.exe` (использовать скрытый `sing-box-bg.exe`) |
 | `-SkipTask` | Не добавлять автозапуск в `HKCU\...\Run` |
 | `-SkipAntigravity` | Пропустить патч Antigravity IDE |
 | `-SkipV0` | Не включать локальный PAC для браузера |
 | `-SkipOpenCode` | Не настраивать OpenCode Desktop / CLI и `PATH` |
+| `-SkipClaudeCode` | Не настраивать прокси и конфиги Claude Code |
 | `-SkipShortcuts` | Не изменять ярлыки приложений |
 | `-SkipPath` | Не изменять пользовательский `PATH` |
 
