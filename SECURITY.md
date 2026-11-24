@@ -1,34 +1,34 @@
-# Security & Privacy
+# Безопасность и приватность
 
-**English** · [Русский](./SECURITY.ru.md)
+**Русский** · [English](./SECURITY.en.md)
 
-## Secret Storage
+## Хранение секретов
 
-`GravProxy.exe` and the files in this repository do not contain hardcoded VLESS keys, subscription URLs, API keys, or telemetry.
+`GravProxy.exe` и файлы в этом репозитории не содержат зашитых VLESS-ключей, ссылок на подписки, API-ключей или телеметрии.
 
-All user credentials and runtime configurations are stored locally on your machine only:
+Все пользовательские параметры хранятся исключительно локально на устройстве:
 
-- VLESS key and subscription URL — in user environment variables `AG_PROXY_VLESS` and `AG_PROXY_SUB_URL`.
-- Generated `sing-box` configuration — in `%LOCALAPPDATA%\ag-proxy\sing-box.json`.
-- Claude Desktop `3p` profile and API keys — in `%LOCALAPPDATA%\Claude-3p\configLibrary\` (including MSIX VFS `Packages\Claude_*\LocalCache\Local\Claude-3p`).
+- VLESS-ключ и URL подписки — в пользовательских переменных окружения `AG_PROXY_VLESS` и `AG_PROXY_SUB_URL`.
+- Итоговая конфигурация `sing-box` — в `%LOCALAPPDATA%\ag-proxy\sing-box.json`.
+- Профиль `3p` и API-ключи Claude Desktop — в `%LOCALAPPDATA%\Claude-3p\configLibrary\` (включая VFS-каталог MSIX `Packages\Claude_*\LocalCache\Local\Claude-3p`).
 
-## Integrity & Binary Audit (`GravProxy.exe`)
+## Проверка целостности и аудит `GravProxy.exe`
 
-Before running `GravProxy.exe`, you can verify its checksum and inspect all bundled scripts without executing it:
+Перед запуском вы можете проверить контрольную сумму и содержимое бинарника без его выполнения:
 
-1. **Verify SHA-256**:
+1. **Проверка SHA-256**:
 
 ```powershell
 Get-FileHash .\GravProxy.exe -Algorithm SHA256
 ```
 
-Compare the output with the hash published on the [Releases](https://github.com/qlfu/grav-proxy/releases/latest) page (`v1.4.0`: `49CF00B60ACCC18E2DF41A5634BD2AE7715944DCC43A02DF52EA134D1BDE304B`).
+Сравните полученное значение со значением на странице [Releases](https://github.com/qlfu/grav-proxy/releases/latest) (для `v1.4.0`: `49CF00B60ACCC18E2DF41A5634BD2AE7715944DCC43A02DF52EA134D1BDE304B`).
 
-2. **Inspect the embedded ZIP bundle**:
+2. **Прозрачный аудит встроенных скриптов**:
 
-`GravProxy.exe` is a `.NET` launcher with an embedded ZIP archive (`GravProxy.bundle.zip`) containing the PowerShell scripts (`setup.ps1`, `setup-ui.ps1`, `happ-config.ps1`), C# source files (`payload\*.cs`), secret-free `payload\sing-box.json` template, and `payload\sing-box.exe`.
+`GravProxy.exe` — это `.NET`-лаунчер со встроенным ZIP-архивом (`GravProxy.bundle.zip`). Внутри лежат исходные скрипты PowerShell (`setup.ps1`, `setup-ui.ps1`, `happ-config.ps1`), C#-код лаунчеров/трея (`payload\*.cs`), шаблон `payload\sing-box.json` без секретов и `payload\sing-box.exe`.
 
-You can open `GravProxy.exe` in 7-Zip or list/extract entries with built-in PowerShell/.NET APIs:
+Вы можете открыть `GravProxy.exe` через 7-Zip или просмотреть список/содержимое архива встроенными средствами .NET / PowerShell:
 
 ```powershell
 Add-Type -AssemblyName System.IO.Compression.FileSystem
@@ -45,6 +45,6 @@ for ($i = $bytes.Length - 22; $i -ge 0; $i--) {
 }
 ```
 
-## Reporting Vulnerabilities
+## Сообщение об уязвимостях
 
-Please report security issues via **GitHub Security Advisories** or Issues in `qlfu/grav-proxy`. Do not include real VLESS URIs, subscription URLs, API keys, or token-bearing logs in public reports.
+Если вы обнаружили ошибку безопасности, сообщите о ней через **GitHub Security Advisories** или Issues репозитория `qlfu/grav-proxy`. Не прикладывайте к отчётам свои реальные VLESS-ссылки, подписки, API-ключи и фрагменты логов с токенами.

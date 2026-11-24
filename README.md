@@ -1,170 +1,168 @@
 # GravProxy (`grav-proxy`)
 
-**English** · [Русский](./README.ru.md)
+**Русский** · [English](./README.en.md)
 
 ![Version](https://img.shields.io/badge/version-v1.4.0-blue) ![Platform](https://img.shields.io/badge/platform-Windows%2010%2F11%20x64-lightgrey) ![License](https://img.shields.io/badge/license-MIT-green)
 
-A portable, single-file local proxy (`127.0.0.1:28080`) and PAC router (`127.0.0.1:28081`) installer powered by `sing-box` (`1.14.4`, `windows/amd64`) for **Antigravity IDE**, **v0.app**, **Gemini Desktop**, **NotebookLM**, **OpenCode Desktop / CLI**, and **Claude Desktop** on Windows 10/11 x64.
+Портативный однофайловый установщик локального прокси (`127.0.0.1:28080`) и локального PAC-маршрутизатора (`127.0.0.1:28081`) на базе `sing-box` (`1.14.4`, `windows/amd64`) для **Antigravity IDE**, **v0.app**, **Gemini Desktop**, **NotebookLM**, **OpenCode Desktop / CLI** и **Claude Desktop** на Windows 10/11 x64.
 
-The standalone executable [`GravProxy.exe`](./GravProxy.exe) is available on the [Releases](https://github.com/qlfu/grav-proxy/releases/latest) page (`SHA-256` for `v1.4.0`: `49CF00B60ACCC18E2DF41A5634BD2AE7715944DCC43A02DF52EA134D1BDE304B`).
-
-> Note: Installer and tray UI labels are currently in Russian; key menu items are noted below alongside their English meanings.
+Готовый автономный файл [`GravProxy.exe`](./GravProxy.exe) доступен на странице [Releases](https://github.com/qlfu/grav-proxy/releases/latest) (`SHA-256` для `v1.4.0`: `49CF00B60ACCC18E2DF41A5634BD2AE7715944DCC43A02DF52EA134D1BDE304B`).
 
 ---
 
-## Features
+## Возможности
 
-- **Single `.exe` executable**: extracts components into a temporary directory (`%TEMP%\ag-proxy-sfx-*`), runs the WPF GUI in-process with a native taskbar icon (no separate PowerShell window), and cleans up temporary files on exit. Bundles `sing-box.exe` (with automatic download fallback from `SagerNet/sing-box` on GitHub if missing).
-- **Auto-detection for VLESS / Happ & upstream proxy mode**:
-  - Finds keys or subscriptions from the **Happ** client (`subscription_log.txt`, Happ configs/registry) or user environment variables `AG_PROXY_VLESS` / `AG_PROXY_SUB_URL`.
-  - Supports direct upstream `socks5://...` / `http://...` URIs (e.g., `socks5://127.0.0.1:10808` while Happ is running) and automatically falls back to Happ's local proxy if the subscription URL is blocked by an ISP.
-  - Tests nodes through real `sing-box` against **Google GeoIP** (filtering out FakeIP and unsupported locations) and picks the fastest working node.
-- **In-place patching without duplicates**:
-  - Patches `agy.exe` and `language_server*.exe` in-place while storing original backups and a SHA-256 manifest in `%LOCALAPPDATA%\ag-proxy\backups\`.
-  - Updates existing Antigravity and OpenCode shortcuts (Desktop, Start Menu, Taskbar) via self-checking launchers (`ag_launch.exe` / `oc_launch.exe`) while preserving original icons.
-  - Automatically verifies and restores patches on every app launch and periodically from the tray app.
-- **v0.app, Gemini Desktop, and NotebookLM via local PAC**:
-  - Runs a local PAC server at `http://127.0.0.1:28081/proxy.pac` for WinINet, Chrome/Edge, and **Gemini Desktop** (without modifying `Gemini.exe`, keeping `Alt+Space` and auto-updates intact).
-  - Routes only targeted AI domains through the proxy (`v0.app`, `vercel.*`, `gemini.google.com`, `notebooklm.google.com`, `notebook.google.com`, `cloudcode-pa.googleapis.com`, `opencode.ai`, `openrouter.ai`, `api.openai.com`, `api.anthropic.com`, `anthropic.com`, `claude.ai`, `claude.com`, `claude.app`, `claudeusercontent.com`, `claudemcpcontent.com`, etc.); all other traffic stays `DIRECT`.
-- **Claude Desktop (proxy + optional API key without Anthropic sign-in)**:
-  - Stops running `Claude.exe` processes cleanly before updating config, removes conflicting `hybridPointer` entries, and writes `egressProxyUrl = http://127.0.0.1:28080` to `%LOCALAPPDATA%\Claude-3p\configLibrary\` (as well as MSIX VFS `Packages\Claude_*\LocalCache\Local\Claude-3p` and existing `%APPDATA%\Claude-3p`), requiring no admin privileges.
-  - When an API key (`sk-ant-...` or `sk-or-...` / custom gateway with `Base URL` and `Bearer` / `x-api-key` auth scheme) is provided, sets `deploymentMode: "3p"` so Claude Desktop works without mandatory `claude.ai` sign-in.
-  - Checks installed Claude Desktop versions (`>= 1.44121.1` for proxy, `>= 4.16336.0` for full `3p`) and warns if `HKLM` or `HKCU\Software\Policies\Claude` overrides local settings.
-- **System tray controller (`proxy-tray.exe`)**:
-  - Launches GravProxy settings directly via **«Открыть GravProxy»** (*Open GravProxy*, using `%LOCALAPPDATA%\ag-proxy\GravProxy.exe`).
-  - Color status icon, proxy toggle (PAC automatically returns `DIRECT` while paused), automatic clean-node failover, manual server picker, connectivity probe, **«Проверить и перепатчить всё»** (*Check and repatch all*, including Claude Desktop), quick app launchers (**Antigravity**, **v0.app**, **Gemini Desktop**, **NotebookLM**, **OpenCode**, **Claude**), `proxy.log` viewer, and install folder shortcut.
-- **Cleanup of conflicting bypasses and stale autostart**:
-  - Removes conflicting DNS/NRPT rules, `ag_dns.exe`, `AG Unlocker` scheduled tasks, legacy `v0-chrome` profile, and AI entries in `hosts` (leaving unrelated entries untouched; UAC is only requested if privileged conflicts exist).
-  - Cleans broken/legacy Startup entries (`*.disabled`, `Run-Proxy.vbs`, `Update-Egress.vbs`, and stale `HKCU\...\Run` / scheduled task items).
-- **No admin rights required & clean uninstall**: installs into `%LOCALAPPDATA%\ag-proxy` and fully reverts changes on uninstall.
-
----
-
-## System Requirements
-
-- **OS**: Windows 10 or Windows 11 (x64).
-- **Built-in Windows components**: `.NET Framework 4.5+`, `PowerShell 5.1`, `curl.exe`.
-- **Administrator rights**: not required.
-- **Proxy / VPN**: **Happ** client with an active subscription/local proxy (`10808`/`10809`), or a `vless://...` / `https://...` / `socks5://...` URL.
+- **Единый `.exe` файл**: при запуске распаковывает компоненты во временный каталог (`%TEMP%\ag-proxy-sfx-*`), запускает WPF-интерфейс с нативной иконкой прямо внутри процесса без окна PowerShell и очищает временные файлы после выхода. Внутри уже встроен `sing-box.exe` (при отсутствии предусмотрено автоскачивание с GitHub `SagerNet/sing-box`).
+- **Автоопределение VLESS / Happ и локальный прокси**:
+  - Находит ключ или подписку из клиента **Happ** (`subscription_log.txt`, конфиги/реестр Happ) или переменных `AG_PROXY_VLESS` / `AG_PROXY_SUB_URL`.
+  - Поддерживает прямой upstream-режим `socks5://...` / `http://...` (например, `socks5://127.0.0.1:10808` при включённом Happ) и автоматически переключается на локальный прокси Happ, если подписка блокируется провайдером.
+  - Тестирует серверы через реальный `sing-box` на **Google GeoIP** (отсеивая FakeIP и неподдерживаемые регионы) и выбирает узел с минимальной задержкой.
+- **Патч оригинальных программ на месте (без дубликатов)**:
+  - Патчит `agy.exe` и `language_server*.exe` на месте, сохраняя оригиналы и SHA-256 манифест в `%LOCALAPPDATA%\ag-proxy\backups\`.
+  - Настраивает оригинальные ярлыки Antigravity и OpenCode (Рабочий стол, «Пуск», панель задач) через лаунчеры `ag_launch.exe` / `oc_launch.exe` с сохранением иконок.
+  - Автоматически проверяет и восстанавливает патчи при каждом запуске и по таймеру из трея.
+- **v0.app, Gemini Desktop и NotebookLM через локальный PAC**:
+  - Поднимает локальный PAC-сервер `http://127.0.0.1:28081/proxy.pac` для WinINet, Chrome/Edge и **Gemini Desktop** (без модификации `Gemini.exe`, с сохранением `Alt+Space` и автообновлений).
+  - Проксирует только целевые AI-домены (`v0.app`, `vercel.*`, `gemini.google.com`, `notebooklm.google.com`, `notebook.google.com`, `cloudcode-pa.googleapis.com`, `opencode.ai`, `openrouter.ai`, `api.openai.com`, `api.anthropic.com`, `anthropic.com`, `claude.ai`, `claude.com`, `claude.app`, `claudeusercontent.com`, `claudemcpcontent.com` и др.); весь остальной трафик идёт `DIRECT`.
+- **Claude Desktop (прокси + опциональный API-ключ без входа в Anthropic)**:
+  - Останавливает фоновые процессы `Claude.exe`, очищает мешающий `hybridPointer` и записывает `egressProxyUrl = http://127.0.0.1:28080` в `%LOCALAPPDATA%\Claude-3p\configLibrary\` (а также в MSIX VFS-папку `Packages\Claude_*\LocalCache\Local\Claude-3p` и существующий `%APPDATA%\Claude-3p`), работая без прав администратора.
+  - При вводе API-ключа (`sk-ant-...` либо `sk-or-...` / стороннего шлюза с `Base URL` и схемой `Bearer` / `x-api-key`) синхронизирует `deploymentMode: "3p"` для работы без обязательной авторизации в `claude.ai`.
+  - Проверяет установленную версию Claude Desktop (`>= 1.44121.1` для прокси, `>= 4.16336.0` для полного `3p`) и наличие групповых политик `HKLM` / `HKCU\Software\Policies\Claude`.
+- **Управление из системного трея (`proxy-tray.exe`)**:
+  - Быстрое открытие установщика/настроек через **«Открыть GravProxy»** (`%LOCALAPPDATA%\ag-proxy\GravProxy.exe`).
+  - Цветовая индикация статуса, включение/выключение прокси (при паузе PAC отдаёт `DIRECT`), автоматическое переключение на запасной чистый сервер (failover), ручной подбор сервера, проверка соединения, **«Проверить и перепатчить всё»** (включая Claude Desktop), запуск приложений (**Antigravity**, **v0.app**, **Gemini Desktop**, **NotebookLM**, **OpenCode**, **Claude**), просмотр `proxy.log` и папки установки.
+- **Очистка конфликтующих обходов и старого автозапуска**:
+  - Убирает мешающие DNS/NRPT-правила, `ag_dns.exe`, задачи `AG Unlocker`, профиль `v0-chrome` и AI-записи из `hosts` (не затрагивая сторонние записи; UAC запрашивается только при наличии таких конфликтов).
+  - Убирает сломанные/устаревшие файлы автозагрузки (`*.disabled`, `Run-Proxy.vbs`, `Update-Egress.vbs` и старые записи `HKCU\...\Run` / задач).
+- **Работа без прав администратора и чистое удаление**: установка в `%LOCALAPPDATA%\ag-proxy` и полный откат при удалении.
 
 ---
 
-## Quick Start (GUI)
+## Системные требования
 
-1. Download [`GravProxy.exe`](./GravProxy.exe) from [Releases](https://github.com/qlfu/grav-proxy/releases/latest) and double-click to run.
-2. **Proxy Server (VLESS / Happ)**:
-   - Leave the input blank for automatic detection (`AG_PROXY_VLESS`, `AG_PROXY_SUB_URL`, or Happ), or click **«Найти в Happ»** (*Detect in Happ*).
-   - If newer Happ versions encrypt `subs.db` or your ISP blocks the subscription URL, paste your `https://...` subscription URL, `vless://...` key, or local proxy address `socks5://127.0.0.1:10808` (with Happ connected to Netherlands/Poland).
-3. **Components**: select what to configure (`Tray & Autostart`, `Antigravity IDE`, `v0.app / Gemini Desktop / NotebookLM`, `OpenCode Desktop & CLI`, `Claude Desktop`). For `Claude Desktop`, optionally enter an API key, `Base URL`, and toggle `Bearer` / `x-api-key`.
-4. Click **«Установить»** (*Install*) — or **«Перепатчить»** (*Repatch*) to re-sync patches and Claude Desktop settings without rebuilding the proxy key.
-5. Click **«Проверить»** (*Test*) to check external IP, Google GeoIP, Antigravity, v0.app, Gemini, NotebookLM, OpenCode, OpenRouter, and Claude / Anthropic API.
-
-> Supports theme switching (`Auto` / `Light` / `Dark`) and closing the window with `Esc` when no task is running.
+- **ОС**: Windows 10 или Windows 11 (x64).
+- **Встроенные компоненты Windows**: `.NET Framework 4.5+`, `PowerShell 5.1`, `curl.exe`.
+- **Права администратора**: не требуются.
+- **Прокси / VPN**: клиент **Happ** с активной подпиской/локальным прокси (`10808`/`10809`), либо ссылка `vless://...` / `https://...` / `socks5://...`.
 
 ---
 
-## Usage After Installation
+## Быстрый старт (GUI)
 
-- **GravProxy**: open anytime from the system tray icon → **«Открыть GravProxy»** (*Open GravProxy*).
-- **Antigravity IDE** & **OpenCode Desktop**: launch normally from your existing shortcuts.
-- **OpenCode CLI**: run `opencode`, `oc`, or `opencode-proxy` in a new terminal window.
-- **Claude Desktop**: launch normally or via **«Открыть Claude»** (*Open Claude*) in the tray menu.
-- **Gemini Desktop**: launch normally or press `Alt+Space` (routes through PAC `:28081` while the proxy is active).
-- **v0.app** & **NotebookLM**: open in Chrome or Edge while the proxy is running.
-- **Custom PAC domains**: create `%LOCALAPPDATA%\ag-proxy\pac-domains.txt` (one domain per line; lines starting with `#` are ignored).
+1. Скачайте [`GravProxy.exe`](./GravProxy.exe) со страницы [Releases](https://github.com/qlfu/grav-proxy/releases/latest) и запустите двойным кликом.
+2. **Прокси-сервер (VLESS / Happ)**:
+   - Оставьте поле пустым для автоподхвата (`AG_PROXY_VLESS`, `AG_PROXY_SUB_URL` или Happ), либо нажмите **«Найти в Happ»**.
+   - При шифровании `subs.db` в новых версиях Happ или блокировке подписки вставьте вручную ссылку подписки `https://...`, ключ `vless://...` или адрес локального прокси `socks5://127.0.0.1:10808` (при включённом Happ на Нидерландах/Польше).
+3. **Компоненты**: отметьте нужные пункты (`Значок в трее и автозапуск`, `Antigravity IDE`, `v0.app / Gemini Desktop / NotebookLM`, `OpenCode Desktop и CLI`, `Claude Desktop`). Для `Claude Desktop` при желании введите API-ключ, `Base URL` и выберите схему `Bearer` / `x-api-key`.
+4. Нажмите **«Установить»** (или **«Перепатчить»** для повторной синхронизации патчей и настроек Claude Desktop без пересборки ключа прокси).
+5. Нажмите **«Проверить»**, чтобы протестировать внешний IP, Google GeoIP, Antigravity, v0.app, Gemini, NotebookLM, OpenCode, OpenRouter и Claude / Anthropic API.
+
+> Доступны переключатель темы (`Авто` / `Светлая` / `Тёмная`) и закрытие окна по `Esc` (когда установка не запущена).
 
 ---
 
-## Command-Line Mode (CLI)
+## Использование после установки
 
-Passing any arguments starts [`GravProxy.exe`](./GravProxy.exe) in console mode:
+- **GravProxy**: открывайте прямо из значка в трее → **«Открыть GravProxy»**.
+- **Antigravity IDE** и **OpenCode Desktop**: запускайте через обычные ярлыки.
+- **OpenCode CLI**: используйте `opencode`, `oc` или `opencode-proxy` в новом окне терминала.
+- **Claude Desktop**: запускайте из ярлыка или через **«Открыть Claude»** в трее.
+- **Gemini Desktop**: используйте обычный ярлык или `Alt+Space` (при активном прокси трафик идёт через PAC `:28081`).
+- **v0.app** и **NotebookLM**: открывайте в Chrome или Edge при активном прокси.
+- **Свои домены в PAC**: создайте `%LOCALAPPDATA%\ag-proxy\pac-domains.txt` (по одному домену в строке, `#` — комментарий).
+
+---
+
+## Режим командной строки (CLI)
+
+При передаче любых аргументов [`GravProxy.exe`](./GravProxy.exe) запускается в консольном режиме:
 
 ```powershell
-# Full unattended install
+# Полная автоматическая установка
 .\GravProxy.exe -Cli
 
-# Install with explicit VLESS, subscription, or local SOCKS5/HTTP proxy
+# Установка с явным VLESS, подпиской или локальным SOCKS5/HTTP прокси
 .\GravProxy.exe -VlessUrl "vless://..."
 .\GravProxy.exe -SubUrl "https://example.com/sub"
 .\GravProxy.exe -VlessUrl "socks5://127.0.0.1:10808"
 
-# Re-patch Antigravity, OpenCode, Claude Desktop, and shortcuts
+# Повторный патч Antigravity, OpenCode, Claude Desktop и ярлыков
 .\GravProxy.exe -PatchOnly
 
-# Configure Claude Desktop with an API key
+# Настройка Claude Desktop по API-ключу
 .\GravProxy.exe -Cli -ClaudeApiKey "sk-ant-..."
 .\GravProxy.exe -Cli -ClaudeApiKey "sk-or-v1-..." -ClaudeBaseUrl "https://openrouter.ai/api" -ClaudeAuthScheme x-api-key
 
-# Full uninstall and rollback
+# Полное удаление и откат
 .\GravProxy.exe -Uninstall
 ```
 
-| Flag | Description |
+| Параметр | Описание |
 | --- | --- |
-| `-TargetRoot <path>` | Install directory (default: `%LOCALAPPDATA%\ag-proxy`) |
-| `-VlessUrl <url>` | `vless://...`, `socks5://...`, `http://...`, or `https://...` subscription URL |
-| `-SubUrl <url>` | Subscription URL with automatic Google GeoIP clean-node selection |
-| `-ClaudeApiKey <key>` | Claude Desktop API key (`sk-ant-...`, `sk-or-...`, or gateway key) |
-| `-ClaudeBaseUrl <url>` | Custom `inferenceGatewayBaseUrl` for Claude Desktop |
-| `-ClaudeAuthScheme <scheme>` | Gateway auth scheme: `bearer` (default) or `x-api-key` |
-| `-PatchOnly` | Only re-patch Antigravity / shortcuts / PAC / OpenCode / Claude Desktop and clean stale autostart |
-| `-Uninstall` | Close blocking apps, restore originals, and delete installation |
-| `-SkipTray` | Do not compile/run `proxy-tray.exe` (use headless `sing-box-bg.exe` instead) |
-| `-SkipTask` | Do not register `HKCU\...\Run` autostart |
-| `-SkipAntigravity` | Skip Antigravity IDE patching |
-| `-SkipV0` | Disable local browser PAC setup |
-| `-SkipOpenCode` | Skip OpenCode Desktop / CLI and `PATH` setup |
-| `-SkipClaudeDesktop` | Skip Claude Desktop proxy and `3p` config setup |
-| `-SkipShortcuts` | Do not modify app shortcuts |
-| `-SkipPath` | Do not modify user `PATH` |
+| `-TargetRoot <путь>` | Каталог установки (по умолчанию `%LOCALAPPDATA%\ag-proxy`) |
+| `-VlessUrl <url>` | Ссылка `vless://...`, `socks5://...`, `http://...` или URL подписки `https://...` |
+| `-SubUrl <url>` | URL подписки `https://...` с автоподбором чистого сервера Google GeoIP |
+| `-ClaudeApiKey <key>` | API-ключ Claude Desktop (`sk-ant-...`, `sk-or-...` или ключ шлюза) |
+| `-ClaudeBaseUrl <url>` | Свой URL шлюза `inferenceGatewayBaseUrl` для Claude Desktop |
+| `-ClaudeAuthScheme <scheme>` | Схема авторизации шлюза: `bearer` (по умолчанию) или `x-api-key` |
+| `-PatchOnly` | Только перепатчить Antigravity / ярлыки / PAC / OpenCode / Claude Desktop и очистить старый автозапуск |
+| `-Uninstall` | Закрыть мешающие процессы, вернуть оригиналы и удалить установку |
+| `-SkipTray` | Не собирать и не запускать `proxy-tray.exe` (использовать скрытый `sing-box-bg.exe`) |
+| `-SkipTask` | Не добавлять автозапуск в `HKCU\...\Run` |
+| `-SkipAntigravity` | Пропустить патч Antigravity IDE |
+| `-SkipV0` | Не включать локальный PAC для браузера |
+| `-SkipOpenCode` | Не настраивать OpenCode Desktop / CLI и `PATH` |
+| `-SkipClaudeDesktop` | Не настраивать прокси и конфиг Claude Desktop |
+| `-SkipShortcuts` | Не изменять ярлыки приложений |
+| `-SkipPath` | Не изменять пользовательский `PATH` |
 
 ---
 
-## File Locations
+## Расположение рабочих файлов
 
 - `%LOCALAPPDATA%\ag-proxy\`:
-  - `GravProxy.exe` — copy of the installer launched from the tray menu.
-  - `sing-box.exe`, `sing-box.json`, `sing-box.template.json` — proxy core and config.
-  - `proxy-tray.exe`, `sing-box-bg.exe` — system tray controller and local PAC server (`:28081`).
-  - `ag_launch.exe`, `oc_launch.exe` — launchers with automatic patch and shortcut checks.
-  - `backups\` — original Antigravity backups (`manifest.json` + `*.bak`) and moved legacy Startup items (`startup-disabled\`, `startup-legacy\`).
+  - `GravProxy.exe` — копия установщика для запуска из меню трея.
+  - `sing-box.exe`, `sing-box.json`, `sing-box.template.json` — ядро прокси и конфигурация.
+  - `proxy-tray.exe`, `sing-box-bg.exe` — значок в трее и встроенный PAC-сервер (`:28081`).
+  - `ag_launch.exe`, `oc_launch.exe` — лаунчеры с автопроверкой патча и ярлыков.
+  - `backups\` — резервные копии Antigravity (`manifest.json` + `*.bak`) и перенесённые старые элементы автозагрузки (`startup-disabled\`, `startup-legacy\`).
   - `shortcuts-backup.json`, `pac-backup.json`, `proxy.log`.
-- `%LOCALAPPDATA%\Claude-3p\configLibrary\` — local `3p` configuration for Claude Desktop.
+- `%LOCALAPPDATA%\Claude-3p\configLibrary\` — локальный профиль `3p` для Claude Desktop.
 
 ---
 
-## Security, Privacy, and SmartScreen
+## Безопасность, приватность и SmartScreen
 
-- **No embedded keys or telemetry**: see [SECURITY.md](./SECURITY.md) for local credential storage details, `SHA-256` verification, and instructions to inspect the embedded ZIP bundle before running `GravProxy.exe`.
-- **Windows Defender SmartScreen**: `GravProxy.exe` is not signed with a commercial EV certificate, so Windows may show *"Windows protected your PC"* on first launch — click **More info → Run anyway** (you can verify the `SHA-256` hash and inspect the `.exe` contents in 7-Zip beforehand).
+- **Нет встроенных ключей и телеметрии**: подробности о хранении данных и проверке хэша/ZIP-содержимого `GravProxy.exe` приведены в [SECURITY.ru.md](./SECURITY.md).
+- **Windows Defender SmartScreen**: бинарник `GravProxy.exe` не подписан коммерческим EV-сертификатом, поэтому при первом запуске Windows может показать предупреждение *«Система Windows защитила ваш компьютер»* — нажмите **«Подробнее» → «Выполнить в любом случае»** (предварительно можно сверить `SHA-256` и открыть `.exe` через 7-Zip).
 
 ---
 
-## FAQ
+## Частые вопросы
 
-**Google API region error (`User location is not supported`)**
-Open the tray menu → **«Подобрать сервер (Google GeoIP)»** (*Select clean server*), or click **«Найти в Happ»** and reinstall the config.
+**Ошибка региона Google API (`User location is not supported`)**
+Откройте меню трея → **«Подобрать сервер (Google GeoIP)»**, либо нажмите **«Найти в Happ»** и переустановите конфиг.
 
-**Happ is not detected (`subs.db` encrypted or subscription blocked by ISP)**
-Paste the `https://...` subscription URL or `vless://...` key manually, or turn on Happ (e.g., Netherlands/Poland) and enter `socks5://127.0.0.1:10808` (or `http://127.0.0.1:10809`).
+**Happ не определяется автоматически (`subs.db` зашифрован или подписка заблокирована провайдером)**
+Вставьте ссылку подписки `https://...` или `vless://...` вручную, либо включите Happ (например, Нидерланды/Польшу) и укажите `socks5://127.0.0.1:10808` (или `http://127.0.0.1:10809`).
 
-**Claude Desktop patch does not take effect**
-Ensure Claude Desktop is up to date from `claude.ai/download` (`>= 1.44121.1` for `egressProxyUrl`, `>= 4.16336.0` for full `3p`), run `GravProxy.exe v1.4.0` (or **«Проверить и перепатчить всё»** in the tray), and check for `HKLM`/`HKCU\Software\Policies\Claude` registry policies:
+**Не работает патч Claude Desktop**
+Убедитесь, что установлен актуальный Claude Desktop с `claude.ai/download` (`>= 1.44121.1` для `egressProxyUrl`, `>= 4.16336.0` для полного `3p`), запустите `GravProxy.exe v1.4.0` (или **«Проверить и перепатчить всё»** в трее) и проверьте отсутствие политик в реестре `HKLM`/`HKCU\Software\Policies\Claude`:
 
 ```powershell
 Get-AppxPackage *Claude* | Select Name,Version; foreach($k in 'HKLM:\SOFTWARE\Policies\Claude','HKCU:\Software\Policies\Claude'){if(Test-Path $k){$k; Get-ItemProperty $k}}; Get-Content "$env:LOCALAPPDATA\Claude-3p\configLibrary\_meta.json" -EA 0; Select-String -Path "$env:LOCALAPPDATA\Claude\logs\main.log","$env:LOCALAPPDATA\Claude-3p\logs\main.log" -Pattern 'managedConfig|egress-proxy|deploymentMode|Error|fail' -EA 0 | Select -Last 25
 ```
 
-**"Select an app to open `.disabled` file" or missing `Run-Proxy.vbs` popup on Windows sign-in**
-Run `GravProxy.exe v1.4.0` (*Install* or *Repatch*) — it automatically moves broken `.disabled` files and cleans stale `Run-Proxy.vbs` autostart items.
+**После входа в Windows появляется окно выбора программы для `.disabled` или ошибка `Run-Proxy.vbs`**
+Запустите `GravProxy.exe v1.4.0` («Установить» или «Перепатчить») — он автоматически уберёт устаревшие файлы и записи автозагрузки.
 
-**Port `127.0.0.1:28080` already in use**
-Exit any existing tray instance via **«Выход»** (*Exit*) or Task Manager, then retry.
+**Порт `127.0.0.1:28080` уже занят**
+Закройте предыдущий экземпляр через значок в трее («Выход») или Диспетчер задач и повторите запуск.
 
 ---
 
-## Documentation and License
+## Документация и лицензия
 
-- Release history: [CHANGELOG.md](./CHANGELOG.md)
-- Security & binary audit: [SECURITY.md](./SECURITY.md)
-- Project license: **MIT** ([LICENSE](./LICENSE)). Release binaries bundle [`sing-box`](https://github.com/SagerNet/sing-box) (`v1.14.4`), distributed under **GPL-3.0-or-later**.
+- История релизов: [CHANGELOG.ru.md](./CHANGELOG.md)
+- Безопасность и аудит сборки: [SECURITY.ru.md](./SECURITY.md)
+- Лицензия проекта: **MIT** ([LICENSE](./LICENSE)). В релизный бинарник включён компонент [`sing-box`](https://github.com/SagerNet/sing-box) (`v1.14.4`), распространяемый по лицензии **GPL-3.0-or-later**.

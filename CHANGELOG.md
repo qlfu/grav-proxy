@@ -1,36 +1,36 @@
-# Changelog
+# История изменений (`CHANGELOG`)
 
-**English** · [Русский](./CHANGELOG.ru.md)
+**Русский** · [English](./CHANGELOG.en.md)
 
 ## `v1.4.0`
 
-- **Windows startup popup fix**: installer, repatch, and uninstaller automatically clean up legacy `*.disabled`, `Run-Proxy.vbs`, `Update-Egress.vbs`, and old shortcuts in the Startup folder, as well as stale `HKCU\...\Run` / `RunOnce` entries and scheduled tasks (keeping only the active `proxy-tray.exe` entry).
-- **Launch GravProxy from tray**: installer copies `GravProxy.exe` into `%LOCALAPPDATA%\ag-proxy\` and adds **«Открыть GravProxy»** (*Open GravProxy*) to the tray menu; uninstalling from a running tray-launched `GravProxy.exe` cleans the rest of the folder without failing.
-- **Claude Desktop patch hardening**:
-  - cleanly stops running `Claude.exe` processes before writing config,
-  - strips conflicting `hybridPointer` keys in `_meta.json` and syncs `appliedId` + `"deploymentMode": "3p"` across `%LOCALAPPDATA%\Claude-3p`, MSIX VFS folders, and `%APPDATA%\Claude-3p`,
-  - checks both `HKLM` and `HKCU\Software\Policies\Claude` registry policies and installed Claude Desktop version,
-  - wires Claude Desktop sync/checks into the GUI **Repatch** button and tray **«Проверить и перепатчить всё»** / **«Открыть Claude»** actions.
+- **Очистка сломанного автозапуска Windows**: при установке, перепатче и удалении автоматически убираются устаревшие файлы `*.disabled`, `Run-Proxy.vbs`, `Update-Egress.vbs` и старые ярлыки из `Автозагрузки`, а также устаревшие записи `HKCU\...\Run` / `RunOnce` и задач планировщика (оставляя только актуальный `proxy-tray.exe`).
+- **Открытие GravProxy из трея**: установщик копирует `GravProxy.exe` в `%LOCALAPPDATA%\ag-proxy\`, а в меню трея добавлен пункт **«Открыть GravProxy»** (безопасное удаление из запущенного GUI больше не падает, если `GravProxy.exe` ещё открыт).
+- **Улучшение патча Claude Desktop**:
+  - перед обновлением конфигурации корректно завершаются фоновые процессы `Claude.exe`,
+  - удаляется конфликтующий `hybridPointer` в `_meta.json` и синхронизируются `appliedId` и `"deploymentMode": "3p"` в `%LOCALAPPDATA%\Claude-3p`, MSIX VFS-папке и `%APPDATA%\Claude-3p`,
+  - проверяются политики `HKLM` / `HKCU\Software\Policies\Claude` и установленная версия Claude Desktop,
+  - кнопка **«Перепатчить»** в GUI и пункт трея **«Проверить и перепатчить всё»** (а также **«Открыть Claude»**) проверяют и пробрасывают настройки Claude Desktop.
 
 ## `v1.3.0`
 
-- **Claude Desktop instead of Claude Code CLI**: removed the earlier CLI wrapper patch (`claude.cmd`, `claude-proxy.cmd`, `~/.claude/*`) and added non-admin Windows **Claude Desktop** (`Claude` / MSIX) support via `%LOCALAPPDATA%\Claude-3p\configLibrary\`.
-- **Claude Desktop proxy & PAC**: sets `egressProxyUrl = http://127.0.0.1:28080` and routes `claude.ai`, `claude.com`, `claude.app`, `claudeusercontent.com`, and `claudemcpcontent.com` via PAC `:28081`.
-- **3P API key mode**: optional configuration for Anthropic API (`sk-ant-...`) or custom gateway (`Base URL`, `Bearer` / `x-api-key`, `deploymentMode: "3p"`) without mandatory Anthropic account login; tray item **«Открыть Claude»**.
+- **Claude Desktop вместо Claude Code CLI**: убран ошибочный CLI-патч (`claude.cmd`, `claude-proxy.cmd`, `~/.claude/*`), добавлена настройка Windows-приложения **Claude Desktop** (`Claude` / MSIX) без прав администратора через `%LOCALAPPDATA%\Claude-3p\configLibrary\`.
+- **Прокси и PAC для Claude Desktop**: запись `egressProxyUrl = http://127.0.0.1:28080`, маршрутизация `claude.ai`, `claude.com`, `claude.app`, `claudeusercontent.com`, `claudemcpcontent.com` через PAC `:28081`.
+- **Режим `3p` с API-ключом**: опциональная настройка Anthropic API (`sk-ant-...`) или стороннего шлюза (`Base URL`, `Bearer` / `x-api-key`, `deploymentMode: "3p"`) без обязательного входа в аккаунт Anthropic; пункт трея **«Открыть Claude»**.
 
 ## `v1.2.0`
 
-- **Native taskbar icon**: embedded STA host runs the WPF installer directly inside `GravProxy.exe` without a child PowerShell window.
-- Initial Claude integration and expanded tray quick-launch menu.
+- **Нативная иконка в панели задач**: встроенный STA-хост запускает WPF-интерфейс внутри процесса `GravProxy.exe` без отдельного дочернего окна PowerShell.
+- Первоначальная интеграция Claude и расширение меню быстрого запуска в трее.
 
 ## `v1.1.0`
 
-- **Local & upstream proxy mode**: supports `socks5://` and `http://` URIs (including **Happ**'s local proxy `127.0.0.1:10808` / `10809`) with automatic fallback when a subscription URL is blocked by an ISP.
-- FakeIP filtering and improved subscription node diagnostics.
+- **Локальный и upstream-режим прокси**: поддержка `socks5://` и `http://` (в том числе локального прокси **Happ** `127.0.0.1:10808` / `10809`) с автоматическим fallback, если подписка заблокирована провайдером.
+- Фильтрация FakeIP и расширенная диагностика доступности серверов из подписки.
 
-## Initial Releases (`352039a` – `83e52a0`)
+## Начальные релизы (`352039a` – `83e52a0`)
 
-- Single-file GUI/CLI installer with automatic **Happ** VLESS discovery and **Google GeoIP** node selection.
-- Local `sing-box` proxy (`127.0.0.1:28080`) and PAC router (`127.0.0.1:28081`) for **v0.app**, **Gemini Desktop**, **NotebookLM**, Chrome, and Edge.
-- In-place patching for **Antigravity IDE** and **OpenCode Desktop / CLI** with rollback backups in `%LOCALAPPDATA%\ag-proxy\backups\`.
-- System tray app (`proxy-tray.exe`) with automatic failover and cleanup of conflicting bypass tools (`AG Unlocker`, NRPT, `hosts`).
+- Однофайловый GUI/CLI-установщик с автоподбором VLESS-узла через **Happ** по **Google GeoIP**.
+- Локальный прокси `sing-box` (`127.0.0.1:28080`) и PAC-сервер (`127.0.0.1:28081`) для **v0.app**, **Gemini Desktop**, **NotebookLM**, Chrome и Edge.
+- Патчинг **Antigravity IDE** и **OpenCode Desktop / CLI** на месте с резервными копиями в `%LOCALAPPDATA%\ag-proxy\backups\`.
+- Значок в трее (`proxy-tray.exe`) с автопереключением узла (failover), очистка конфликтующих обходов (`AG Unlocker`, NRPT, `hosts`).
