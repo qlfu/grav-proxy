@@ -2,11 +2,11 @@
 
 **Русский** · [English](./README.en.md)
 
-![Version](https://img.shields.io/badge/version-v1.4.0-blue) ![Platform](https://img.shields.io/badge/platform-Windows%2010%2F11%20x64-lightgrey) ![License](https://img.shields.io/badge/license-MIT-green)
+![Version](https://img.shields.io/badge/version-v1.5.0-blue) ![Platform](https://img.shields.io/badge/platform-Windows%2010%2F11%20x64-lightgrey) ![License](https://img.shields.io/badge/license-MIT-green)
 
 Портативный однофайловый установщик локального прокси (`127.0.0.1:28080`) и локального PAC-маршрутизатора (`127.0.0.1:28081`) на базе `sing-box` (`1.14.4`, `windows/amd64`) для **Antigravity IDE**, **v0.app**, **Gemini Desktop**, **NotebookLM**, **OpenCode Desktop / CLI** и **Claude Desktop** на Windows 10/11 x64.
 
-Готовый автономный файл [`GravProxy.exe`](./GravProxy.exe) доступен на странице [Releases](https://github.com/qlfu/grav-proxy/releases/latest) (`SHA-256` для `v1.4.0`: `49CF00B60ACCC18E2DF41A5634BD2AE7715944DCC43A02DF52EA134D1BDE304B`).
+Готовый автономный файл [`GravProxy.exe`](./GravProxy.exe) доступен на странице [Releases](https://github.com/qlfu/grav-proxy/releases/latest) (`SHA-256` для `v1.5.0`: `3A9A8992246DC81818ECB18706546D6BB0B72AABD92117177E804E734DE78E1A`).
 
 ---
 
@@ -30,6 +30,7 @@
   - Проверяет установленную версию Claude Desktop (`>= 1.44121.1` для прокси, `>= 4.16336.0` для полного `3p`) и наличие групповых политик `HKLM` / `HKCU\Software\Policies\Claude`.
 - **Управление из системного трея (`proxy-tray.exe`)**:
   - Быстрое открытие установщика/настроек через **«Открыть GravProxy»** (`%LOCALAPPDATA%\ag-proxy\GravProxy.exe`).
+  - Автопроверка обновлений на GitHub (уведомление в трее и пункт **«Проверить обновления»** / **«Обновить до ...»**, также проверка при открытии окна установщика) с валидацией `PE/EXE` и `SHA-256` перед запуском новой версии.
   - Цветовая индикация статуса, включение/выключение прокси (при паузе PAC отдаёт `DIRECT`), автоматическое переключение на запасной чистый сервер (failover), ручной подбор сервера, проверка соединения, **«Проверить и перепатчить всё»** (включая Claude Desktop), запуск приложений (**Antigravity**, **v0.app**, **Gemini Desktop**, **NotebookLM**, **OpenCode**, **Claude**), просмотр `proxy.log` и папки установки.
 - **Очистка конфликтующих обходов и старого автозапуска**:
   - Убирает мешающие DNS/NRPT-правила, `ag_dns.exe`, задачи `AG Unlocker`, профиль `v0-chrome` и AI-записи из `hosts` (не затрагивая сторонние записи; UAC запрашивается только при наличии таких конфликтов).

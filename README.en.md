@@ -2,11 +2,11 @@
 
 [Русский](./README.md) · **English**
 
-![Version](https://img.shields.io/badge/version-v1.4.0-blue) ![Platform](https://img.shields.io/badge/platform-Windows%2010%2F11%20x64-lightgrey) ![License](https://img.shields.io/badge/license-MIT-green)
+![Version](https://img.shields.io/badge/version-v1.5.0-blue) ![Platform](https://img.shields.io/badge/platform-Windows%2010%2F11%20x64-lightgrey) ![License](https://img.shields.io/badge/license-MIT-green)
 
 A portable, single-file local proxy (`127.0.0.1:28080`) and PAC router (`127.0.0.1:28081`) installer powered by `sing-box` (`1.14.4`, `windows/amd64`) for **Antigravity IDE**, **v0.app**, **Gemini Desktop**, **NotebookLM**, **OpenCode Desktop / CLI**, and **Claude Desktop** on Windows 10/11 x64.
 
-The standalone executable [`GravProxy.exe`](./GravProxy.exe) is available on the [Releases](https://github.com/qlfu/grav-proxy/releases/latest) page (`SHA-256` for `v1.4.0`: `49CF00B60ACCC18E2DF41A5634BD2AE7715944DCC43A02DF52EA134D1BDE304B`).
+The standalone executable [`GravProxy.exe`](./GravProxy.exe) is available on the [Releases](https://github.com/qlfu/grav-proxy/releases/latest) page (`SHA-256` for `v1.5.0`: `3A9A8992246DC81818ECB18706546D6BB0B72AABD92117177E804E734DE78E1A`).
 
 > Note: Installer and tray UI labels are currently in Russian; key menu items are noted below alongside their English meanings.
 
@@ -32,6 +32,7 @@ The standalone executable [`GravProxy.exe`](./GravProxy.exe) is available on the
   - Checks installed Claude Desktop versions (`>= 1.44121.1` for proxy, `>= 4.16336.0` for full `3p`) and warns if `HKLM` or `HKCU\Software\Policies\Claude` overrides local settings.
 - **System tray controller (`proxy-tray.exe`)**:
   - Launches GravProxy settings directly via **«Открыть GravProxy»** (*Open GravProxy*, using `%LOCALAPPDATA%\ag-proxy\GravProxy.exe`).
+  - Automatic GitHub update checking (tray balloon + **«Проверить обновления»** / *Check for updates* item, as well as prompt on installer launch) with `PE/EXE` and `SHA-256` verification before launching the downloaded build.
   - Color status icon, proxy toggle (PAC automatically returns `DIRECT` while paused), automatic clean-node failover, manual server picker, connectivity probe, **«Проверить и перепатчить всё»** (*Check and repatch all*, including Claude Desktop), quick app launchers (**Antigravity**, **v0.app**, **Gemini Desktop**, **NotebookLM**, **OpenCode**, **Claude**), `proxy.log` viewer, and install folder shortcut.
 - **Cleanup of conflicting bypasses and stale autostart**:
   - Removes conflicting DNS/NRPT rules, `ag_dns.exe`, `AG Unlocker` scheduled tasks, legacy `v0-chrome` profile, and AI entries in `hosts` (leaving unrelated entries untouched; UAC is only requested if privileged conflicts exist).

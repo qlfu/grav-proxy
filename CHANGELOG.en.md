@@ -2,6 +2,13 @@
 
 [Русский](./CHANGELOG.md) · **English**
 
+## `v1.5.0`
+
+- **GitHub Releases auto-updater (GUI and system tray)**:
+  - Checks the latest `qlfu/grav-proxy` release on GitHub at GUI startup (`setup-ui.ps1`) and in the background from the tray app (`proxy-tray.exe`) via the Releases API with a `/releases/latest` HTML redirect fallback and optional fallback through `127.0.0.1:28080`.
+  - Shows an update button and confirmation prompt in the installer window, plus a tray balloon notification and **«Проверить обновления»** (*Check for updates*) / **«Обновить до ...»** menu item.
+  - Validates the GitHub HTTPS download URL, file size, `MZ` executable header, and `SHA-256` digest before launching the downloaded installer.
+
 ## `v1.4.0`
 
 - **Windows startup popup fix**: installer, repatch, and uninstaller automatically clean up legacy `*.disabled`, `Run-Proxy.vbs`, `Update-Egress.vbs`, and old shortcuts in the Startup folder, as well as stale `HKCU\...\Run` / `RunOnce` entries and scheduled tasks (keeping only the active `proxy-tray.exe` entry).

@@ -22,7 +22,7 @@
 Get-FileHash .\GravProxy.exe -Algorithm SHA256
 ```
 
-Сравните полученное значение со значением на странице [Releases](https://github.com/qlfu/grav-proxy/releases/latest) (для `v1.4.0`: `49CF00B60ACCC18E2DF41A5634BD2AE7715944DCC43A02DF52EA134D1BDE304B`).
+Сравните полученное значение со значением на странице [Releases](https://github.com/qlfu/grav-proxy/releases/latest) (для `v1.5.0`: `3A9A8992246DC81818ECB18706546D6BB0B72AABD92117177E804E734DE78E1A`).
 
 2. **Прозрачный аудит встроенных скриптов**:
 
