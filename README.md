@@ -2,16 +2,16 @@
 
 **Русский** · [English](./README.en.md)
 
-![Version](https://img.shields.io/badge/version-v1.7.0-blue) ![Platform](https://img.shields.io/badge/platform-Windows%2010%2F11%20x64-lightgrey) ![License](https://img.shields.io/badge/license-MIT-green)
+![Version](https://img.shields.io/badge/version-v1.7.1-blue) ![Platform](https://img.shields.io/badge/platform-Windows%2010%2F11%20x64-lightgrey) ![License](https://img.shields.io/badge/license-MIT-green)
 
 Портативный однофайловый установщик локального прокси (`127.0.0.1:28080`) и локального PAC-маршрутизатора (`127.0.0.1:28081`) на базе `sing-box` (`1.14.4`, `windows/amd64`) для **Antigravity 2.0**, **v0.app**, **Gemini Desktop**, **NotebookLM**, **OpenCode Desktop / CLI** и **Claude Desktop** на Windows 10/11 x64 — с основным режимом **VLESS / Happ** и альтернативным режимом **SmartDNS (без VPS/VPN)**.
 
-Готовый автономный файл [`GravProxy.exe`](./GravProxy.exe) доступен на странице [Releases](https://github.com/qlfu/grav-proxy/releases/latest) (`SHA-256` для `v1.7.0`: `4993A8307245E526FA3A5921CCB0BF8492D26ABCA7F5BC2623B5BDCFFB321CD4`).
+Готовый автономный файл [`GravProxy.exe`](./GravProxy.exe) доступен на странице [Releases](https://github.com/qlfu/grav-proxy/releases/latest) (`SHA-256` для `v1.7.1`: `20B216D899AECC89E5658D280BA7FC9A1405E8AB2B30AA01100001F370F76B6D`).
 
 > **English summary:** Portable single-file `sing-box` VLESS/PAC & **SmartDNS (no-VPN)** proxy and in-place patcher for **Antigravity 2.0** (fixes `User location is not supported`, `Agent execution terminated due to error.`, and `Your account is not eligible for Gemini Code Assist for individuals at this time` / `There was an unexpected issue setting up your account.`), **Claude Desktop** (`egressProxyUrl` + `3p` API-key mode without admin rights), **Gemini Desktop**, **NotebookLM**, **v0.app**, and **OpenCode** on Windows 10/11 x64 with GitHub auto-updates. Only AI domains go through the proxy/SmartDNS; regular traffic stays `DIRECT`. Full English guide: [README.en.md](./README.en.md).
 
 <p align="center">
-  <img src="./docs/installer-ui.png" alt="Интерфейс установщика GravProxy v1.7.0" width="760">
+  <img src="./docs/installer-ui.png" alt="Интерфейс установщика GravProxy v1.7.1" width="760">
 </p>
 
 ---
@@ -164,7 +164,7 @@
 
 - **Нет встроенных ключей и телеметрии**: подробности о хранении данных, проверке `SHA-256` и защите встроенного контейнера `GravProxy.exe` приведены в [SECURITY.md](./SECURITY.md).
 - **Windows Defender SmartScreen**: бинарник `GravProxy.exe` не подписан коммерческим EV-сертификатом, поэтому при первом запуске Windows может показать предупреждение *«Система Windows защитила ваш компьютер»* — нажмите **«Подробнее» → «Выполнить в любом случае»** (предварительно сверьте `SHA-256` файла со страницей Releases).
-- **Ложные срабатывания антивируса (`Trojan:Win32/Sabsik.FL.A!ml`, `Wacatac.B!ml` и др.)**: ML-движок Защитника Windows и некоторых антивирусов иногда помечает неподписанный однофайловый установщик с шифрованным ресурсом (`GravProxy.pkg`), распаковкой во временную папку `%TEMP%\ag-proxy-sfx-*` и сборкой вспомогательных лаунчеров через `csc.exe` эвристическими вердиктами класса `!ml`. Это ложное срабатывание (false positive). Сверьте `SHA-256` скачанного файла со значением из Releases (`v1.7.0`: `4993A8307245E526FA3A5921CCB0BF8492D26ABCA7F5BC2623B5BDCFFB321CD4`) и при необходимости добавьте файл или папку `%LOCALAPPDATA%\ag-proxy` в исключения Безопасности Windows.
+- **Ложные срабатывания антивируса (`Trojan:Win32/Sabsik.FL.A!ml`, `Wacatac.B!ml` и др.)**: ML-движок Защитника Windows и некоторых антивирусов иногда помечает неподписанный однофайловый установщик с шифрованным ресурсом (`GravProxy.pkg`), распаковкой во временную папку `%TEMP%\ag-proxy-sfx-*` и сборкой вспомогательных лаунчеров через `csc.exe` эвристическими вердиктами класса `!ml`. Это ложное срабатывание (false positive). Сверьте `SHA-256` скачанного файла со значением из Releases (`v1.7.1`: `20B216D899AECC89E5658D280BA7FC9A1405E8AB2B30AA01100001F370F76B6D`) и при необходимости добавьте файл или папку `%LOCALAPPDATA%\ag-proxy` в исключения Безопасности Windows.
 
 ---
 

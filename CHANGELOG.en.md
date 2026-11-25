@@ -2,6 +2,17 @@
 
 [Русский](./CHANGELOG.md) · **English**
 
+## `v1.7.1`
+
+- **SmartDNS bootstrap & Defender startup fix**:
+  - Switched the `sing-box` bootstrap resolver from `https://1.1.1.1/dns-query` to system `local` (`happ-config.ps1`, `proxy-tray.cs`, `sing-box-bg.cs`) so ISP throttling or blocking of Cloudflare `:443` no longer breaks every DoH preset at once.
+  - Increased `sing-box.exe` probe startup wait from 6 s to 18 s (avoiding false failures during Defender's first scan) and HTTP probe timeouts from 5 s to 7 s with detailed failure diagnostics.
+- **Patching `language_server.exe` while Antigravity is running**:
+  - Added rename-away fallback (`.old.<pid>`) in `WinBytePatcher.WriteAtomic` (`setup.ps1`) and `ag_launch.cs` before replacing locked executables (fixes `MoveFileExW failed (5)`).
+- **Reliable auto-updater with live progress, logs & slow-CDN fallback**:
+  - Replaced single-shot `CopyTo` with a 64 KB chunked reader in `setup-ui.ps1` and `proxy-tray.cs`, showing progress percentage, MB downloaded, and KB/s in both the UI and Log tab.
+  - Automatically switches from stalled/slow direct GitHub downloads (< 40 KB/s after 5 s) to the local proxy `127.0.0.1:28080` when available and cleans up stale `.part` files.
+
 ## `v1.7.0`
 
 - **Built-in SmartDNS (no-VPN / no-VPS) mode inside `sing-box`**:
