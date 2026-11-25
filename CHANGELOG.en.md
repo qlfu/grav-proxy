@@ -20,7 +20,6 @@ Complete architectural rewrite in native **Go 1.27** (`CGO_ENABLED=0`) with a **
 - **Graceful app closing, zero console flashes & clean uninstall**:
   - `StopTargetApps` cleanly closes running target apps (`Antigravity`, `OpenCode`, `Claude`) before patching/restoring while skipping ancestor IDE/terminal processes.
   - All hidden child invocations (`opencode-cli.exe`, `--tray`, `Claude:`, deferred self-delete) use `CREATE_NO_WINDOW`.
-  - Removed legacy `v0.app` / `vercel` PAC rules, connectivity checks, and tray menu entries.
   - Fixes cross-thread tray shutdown (`PostMessageW(wmClose)` + idempotent `NIM_DELETE`), COM STA apartment handling for `.lnk` shortcuts (`withWScriptShell`), automatic migration from `%LOCALAPPDATA%\ag-proxy` to `%LOCALAPPDATA%\GravProxy`, and complete cleanup of `%LOCALAPPDATA%\GravProxy` + `AG_PROXY_*` env vars on uninstall.
 
 ---

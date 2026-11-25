@@ -20,7 +20,7 @@ Always verify the digest of downloaded binaries before running:
 Get-FileHash .\GravProxy.exe -Algorithm SHA256
 ```
 
-Verified `v2.0.0` SHA-256: `A7E8CCA89BE8ECA726A39727B711D1DC1E7264D3CCC1B0C7CE6540473A7A4506` (also posted on [Releases](https://github.com/qlfu/grav-proxy/releases/latest)). The built-in auto-updater verifies GitHub HTTPS origin, `PE/EXE` (`MZ`) header, and `SHA-256` before replacing the running binary.
+Verified `v2.0.0` SHA-256: `8A0253712D29F45E1FB0374EB7E5D194ADA83BFF4D6F2434EA69F10130F522E7` (also posted on [Releases](https://github.com/qlfu/grav-proxy/releases/latest)). The built-in auto-updater verifies GitHub HTTPS origin, `PE/EXE` (`MZ`) header, and `SHA-256` before replacing the running binary.
 
 You can also build an identical binary directly from this repository (see "Building from Source" in [README.en.md](./README.en.md)) or inspect GitHub Actions build artifacts.
 

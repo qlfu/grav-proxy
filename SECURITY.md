@@ -20,7 +20,7 @@
 Get-FileHash .\GravProxy.exe -Algorithm SHA256
 ```
 
-Актуальная сумма `v2.0.0`: `A7E8CCA89BE8ECA726A39727B711D1DC1E7264D3CCC1B0C7CE6540473A7A4506` (см. также [Releases](https://github.com/qlfu/grav-proxy/releases/latest)). Встроенный автообновитель проверяет HTTPS-домен GitHub, заголовок `PE/EXE` (`MZ`) и совпадение `SHA-256` перед заменой бинарника.
+Актуальная сумма `v2.0.0`: `8A0253712D29F45E1FB0374EB7E5D194ADA83BFF4D6F2434EA69F10130F522E7` (см. также [Releases](https://github.com/qlfu/grav-proxy/releases/latest)). Встроенный автообновитель проверяет HTTPS-домен GitHub, заголовок `PE/EXE` (`MZ`) и совпадение `SHA-256` перед заменой бинарника.
 
 При желании вы можете собрать идентичный бинарник самостоятельно из этого репозитория (см. раздел «Сборка из исходников» в [README.md](./README.md)) или скачать артефакт GitHub Actions.
 

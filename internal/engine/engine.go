@@ -896,6 +896,7 @@ func TestConnectivity(ctx context.Context, proxyAddr string, isSmartDNS bool) []
 		{name: "Внешний IP (ipinfo.io)", url: "https://ipinfo.io/json", kind: "ip", expect: []int{200}, optional: isSmartDNS},
 		{name: "Google GeoIP", url: "https://policies.google.com/terms?hl=en", kind: "geo", expect: []int{200}, optional: isSmartDNS},
 		{name: "Antigravity 2.0", url: agURL, kind: "http", expect: []int{200, 401, 404}},
+		{name: "v0.app", url: "https://v0.app", kind: "http", expect: []int{200, 301, 302, 307, 308}, optional: isSmartDNS},
 		{name: "Gemini", url: "https://gemini.google.com/app", kind: "http", expect: []int{200, 301, 302, 307, 308}, optional: isSmartDNS},
 		{name: "NotebookLM", url: "https://notebook.google.com/", kind: "http", expect: []int{200}},
 		{name: "OpenCode", url: "https://opencode.ai", kind: "http", expect: []int{200, 301, 302, 307, 308}, optional: isSmartDNS},

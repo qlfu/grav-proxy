@@ -60,6 +60,7 @@ const (
 	idLaunchCl   = 106
 	idOpenGem    = 107
 	idOpenNB     = 108
+	idOpenV0     = 109
 	idCheckUpd   = 110
 	idApplyUpd   = 111
 	idExit       = 112
@@ -556,6 +557,8 @@ func (s *Service) handleMenuCommand(id int) {
 		_ = exec.Command("rundll32.exe", "url.dll,FileProtocolHandler", "https://gemini.google.com/app").Start()
 	case idOpenNB:
 		_ = exec.Command("rundll32.exe", "url.dll,FileProtocolHandler", "https://notebooklm.google.com/").Start()
+	case idOpenV0:
+		_ = exec.Command("rundll32.exe", "url.dll,FileProtocolHandler", "https://v0.app").Start()
 	case idCheckUpd:
 		go s.checkUpdates(true)
 	case idApplyUpd:
@@ -595,6 +598,7 @@ func (s *Service) showContextMenu() {
 	appendMenuItem(hMenu, mfString, idLaunchCl, "Открыть Claude Desktop")
 	appendMenuItem(hMenu, mfString, idOpenGem, "Открыть Gemini")
 	appendMenuItem(hMenu, mfString, idOpenNB, "Открыть NotebookLM")
+	appendMenuItem(hMenu, mfString, idOpenV0, "Открыть v0.app")
 	appendMenuItem(hMenu, mfSeparator, 0, "")
 	if upd != nil {
 		appendMenuItem(hMenu, mfString, idApplyUpd, "Установить обновление "+upd.Tag)
