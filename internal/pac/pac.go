@@ -360,6 +360,7 @@ const (
 	internetPerConnFlags              = 1
 	internetPerConnAutoConfigURL      = 4
 	proxyTypeDirect                   = 0x00000001
+	proxyTypeProxy                    = 0x00000002
 	proxyTypeAutoProxyURL             = 0x00000004
 	inetSettingsRegPath               = `Software\Microsoft\Windows\CurrentVersion\Internet Settings`
 	pacBackupFile                     = "pac-backup.json"
@@ -385,10 +386,69 @@ type pacBackup struct {
 	AutoConfigURL    string `json:"autoConfigUrl"`
 }
 
+func DefaultPACURL(pacPort int) string {
+	if pacPort <= 0 {
+		pacPort = 28081
+	}
+	return fmt.Sprintf("http://127.0.0.1:%d/proxy.pac?v=2", pacPort)
+}
+
 func IsOurPACURL(u string, pacPort int) bool {
 	low := strings.ToLower(strings.TrimSpace(u))
 	prefix := fmt.Sprintf("http://127.0.0.1:%d/", pacPort)
 	return strings.HasPrefix(low, prefix) || strings.HasPrefix(low, "http://127.0.0.1:28081/")
+}
+
+type SystemPACState struct {
+	WinINetFlags        uint32
+	WinINetAutoURL      string
+	RegAutoURL          string
+	RegProxyEnable      uint32
+	OurPACActive        bool
+	ExternalProxyActive bool
+}
+
+func classifySystemPACState(flags uint32, winINetAutoURL, regAutoURL string, regProxyEnable uint32, pacPort int) SystemPACState {
+	hasExtProxy := (flags&proxyTypeProxy != 0) || regProxyEnable != 0
+	winHasOtherPAC := (flags&proxyTypeAutoProxyURL != 0) && strings.TrimSpace(winINetAutoURL) != "" && !IsOurPACURL(winINetAutoURL, pacPort)
+	regHasOtherPAC := strings.TrimSpace(regAutoURL) != "" && !IsOurPACURL(regAutoURL, pacPort)
+	ext := hasExtProxy || winHasOtherPAC || regHasOtherPAC
+	ours := !ext && (flags&proxyTypeAutoProxyURL != 0) && IsOurPACURL(winINetAutoURL, pacPort) && IsOurPACURL(regAutoURL, pacPort)
+	return SystemPACState{
+		WinINetFlags:        flags,
+		WinINetAutoURL:      winINetAutoURL,
+		RegAutoURL:          regAutoURL,
+		RegProxyEnable:      regProxyEnable,
+		OurPACActive:        ours,
+		ExternalProxyActive: ext,
+	}
+}
+
+func QuerySystemPACState(pacPort int) SystemPACState {
+	flags, winAutoURL, _ := queryWinINetPAC()
+	var regAutoURL string
+	var regProxyEnable uint32
+	if k, err := registry.OpenKey(registry.CURRENT_USER, inetSettingsRegPath, registry.QUERY_VALUE); err == nil {
+		defer k.Close()
+		if v, _, err := k.GetStringValue("AutoConfigURL"); err == nil {
+			regAutoURL = v
+		}
+		if v, _, err := k.GetIntegerValue("ProxyEnable"); err == nil {
+			regProxyEnable = uint32(v)
+		}
+	}
+	return classifySystemPACState(flags, winAutoURL, regAutoURL, regProxyEnable, pacPort)
+}
+
+func EnsureSystemPAC(pacURL, dataDir string, pacPort int) (bool, error) {
+	st := QuerySystemPACState(pacPort)
+	if st.ExternalProxyActive || st.OurPACActive {
+		return false, nil
+	}
+	if err := EnableSystemPAC(pacURL, dataDir, pacPort); err != nil {
+		return false, err
+	}
+	return true, nil
 }
 
 func queryWinINetPAC() (flags uint32, autoURL string, ok bool) {

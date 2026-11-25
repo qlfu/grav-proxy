@@ -21,6 +21,7 @@ import (
 	"github.com/qlfu/grav-proxy/internal/engine"
 	"github.com/qlfu/grav-proxy/internal/happ"
 	"github.com/qlfu/grav-proxy/internal/pac"
+	"github.com/qlfu/grav-proxy/internal/patcher"
 	"github.com/qlfu/grav-proxy/internal/updater"
 )
 
@@ -170,6 +171,10 @@ func Run(selfExe string) error {
 		}
 	}
 
+	if patcher.StopLegacyAgProxyProcesses() > 0 {
+		time.Sleep(250 * time.Millisecond)
+	}
+
 	cfg, dataDir, err := config.Load()
 	if err != nil {
 		return err
@@ -223,7 +228,11 @@ func Run(selfExe string) error {
 			svc.mu.Lock()
 			svc.cfg = c
 			svc.mu.Unlock()
-			return svc.startProxyFromConfig()
+			if err := svc.startProxyFromConfig(); err != nil {
+				return err
+			}
+			svc.ensureBrowserPAC()
+			return nil
 		},
 		Recheck: func() error {
 			return svc.failoverOrRepick()
@@ -233,6 +242,7 @@ func Run(selfExe string) error {
 		},
 	})
 	_ = svc.pacSrv.Start()
+	svc.ensureBrowserPAC()
 	defer svc.pacSrv.Stop()
 	defer svc.mgr.Stop()
 
@@ -361,6 +371,9 @@ func (s *Service) failoverOrRepick() error {
 func (s *Service) togglePause() (bool, error) {
 	if s.paused.Load() {
 		err := s.startProxyFromConfig()
+		if err == nil {
+			s.ensureBrowserPAC()
+		}
 		return err == nil, err
 	}
 	s.paused.Store(true)
@@ -370,10 +383,26 @@ func (s *Service) togglePause() (bool, error) {
 	return false, nil
 }
 
+func (s *Service) ensureBrowserPAC() bool {
+	if s.paused.Load() || !s.mgr.Running() {
+		return false
+	}
+	s.mu.Lock()
+	c := s.cfg
+	s.mu.Unlock()
+	if !c.Components.BrowserPAC {
+		return false
+	}
+	restored, err := pac.EnsureSystemPAC(pac.DefaultPACURL(c.PACPort), s.dataDir, c.PACPort)
+	return err == nil && restored
+}
+
 func (s *Service) backgroundLoop() {
 	updTimer := time.NewTimer(25 * time.Second)
+	pacTicker := time.NewTicker(5 * time.Second)
 	healthTicker := time.NewTicker(4 * time.Minute)
 	defer updTimer.Stop()
+	defer pacTicker.Stop()
 	defer healthTicker.Stop()
 
 	for {
@@ -383,6 +412,8 @@ func (s *Service) backgroundLoop() {
 		case <-updTimer.C:
 			s.checkUpdates(false)
 			updTimer.Reset(6 * time.Hour)
+		case <-pacTicker.C:
+			s.ensureBrowserPAC()
 		case <-healthTicker.C:
 			if s.paused.Load() || !s.mgr.Running() {
 				continue

@@ -801,7 +801,7 @@ func RemoveTrayAutostart() {
 		return
 	}
 	defer k.Close()
-	for _, name := range []string{"GravProxy", "AntigravityProxyTray", "ag-proxy"} {
+	for _, name := range []string{"GravProxy", "AntigravityLocalProxy", "AntigravityProxyTray", "ag-proxy"} {
 		_ = k.DeleteValue(name)
 	}
 }
@@ -820,7 +820,7 @@ func CleanupLegacyStartupEntries() {
 	k, err := registry.OpenKey(registry.CURRENT_USER, `Software\Microsoft\Windows\CurrentVersion\Run`, registry.SET_VALUE)
 	if err == nil {
 		defer k.Close()
-		for _, legacy := range []string{"AntigravityProxyTray", "ag-proxy", "Run-Proxy"} {
+		for _, legacy := range []string{"AntigravityLocalProxy", "AntigravityProxyTray", "ag-proxy", "Run-Proxy"} {
 			_ = k.DeleteValue(legacy)
 		}
 	}

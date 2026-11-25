@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	AppVersion      = "2.0.0"
+	AppVersion      = "2.0.1"
 	GitHubRepo      = "qlfu/grav-proxy"
 	DefaultProxy    = "http://127.0.0.1:28080"
 	DefaultProxyPt  = 28080

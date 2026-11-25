@@ -67,3 +67,97 @@ func TestWinINetStructSizes(t *testing.T) {
 		t.Fatalf("unexpected internetPerConnOptionList size: got %d want 32", got)
 	}
 }
+
+func TestClassifySystemPACState(t *testing.T) {
+	ourURL := "http://127.0.0.1:28081/proxy.pac?v=2"
+	cases := []struct {
+		name      string
+		flags     uint32
+		winURL    string
+		regURL    string
+		proxyEn   uint32
+		wantOurs  bool
+		wantExt   bool
+	}{
+		{
+			name:     "our PAC intact",
+			flags:    proxyTypeDirect | proxyTypeAutoProxyURL,
+			winURL:   ourURL,
+			regURL:   ourURL,
+			proxyEn:  0,
+			wantOurs: true,
+			wantExt:  false,
+		},
+		{
+			name:     "wiped by VPN disconnect",
+			flags:    proxyTypeDirect,
+			winURL:   "",
+			regURL:   "",
+			proxyEn:  0,
+			wantOurs: false,
+			wantExt:  false,
+		},
+		{
+			name:     "partial wipe wininet cleared",
+			flags:    proxyTypeDirect,
+			winURL:   "",
+			regURL:   ourURL,
+			proxyEn:  0,
+			wantOurs: false,
+			wantExt:  false,
+		},
+		{
+			name:     "partial wipe registry cleared",
+			flags:    proxyTypeDirect | proxyTypeAutoProxyURL,
+			winURL:   ourURL,
+			regURL:   "",
+			proxyEn:  0,
+			wantOurs: false,
+			wantExt:  false,
+		},
+		{
+			name:     "external VPN via ProxyEnable",
+			flags:    proxyTypeDirect | proxyTypeAutoProxyURL,
+			winURL:   ourURL,
+			regURL:   ourURL,
+			proxyEn:  1,
+			wantOurs: false,
+			wantExt:  true,
+		},
+		{
+			name:     "external VPN via WinINet proxy flag",
+			flags:    proxyTypeDirect | proxyTypeProxy,
+			winURL:   "",
+			regURL:   "",
+			proxyEn:  0,
+			wantOurs: false,
+			wantExt:  true,
+		},
+		{
+			name:     "third party PAC in registry",
+			flags:    proxyTypeDirect | proxyTypeAutoProxyURL,
+			winURL:   ourURL,
+			regURL:   "http://127.0.0.1:10809/pac",
+			proxyEn:  0,
+			wantOurs: false,
+			wantExt:  true,
+		},
+		{
+			name:     "third party PAC in wininet",
+			flags:    proxyTypeDirect | proxyTypeAutoProxyURL,
+			winURL:   "http://127.0.0.1:10809/pac",
+			regURL:   "",
+			proxyEn:  0,
+			wantOurs: false,
+			wantExt:  true,
+		},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			st := classifySystemPACState(tc.flags, tc.winURL, tc.regURL, tc.proxyEn, 28081)
+			if st.OurPACActive != tc.wantOurs || st.ExternalProxyActive != tc.wantExt {
+				t.Fatalf("got (ours=%v, ext=%v), want (ours=%v, ext=%v)", st.OurPACActive, st.ExternalProxyActive, tc.wantOurs, tc.wantExt)
+			}
+		})
+	}
+}

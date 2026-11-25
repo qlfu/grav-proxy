@@ -2,6 +2,19 @@
 
 **Русский** · [English](./CHANGELOG.en.md)
 
+## `v2.0.1` — Авто-восстановление Browser PAC после VPN и очистка автозапуска v1.x
+
+- **Автоматический watchdog системного Browser PAC в трее**:
+  - Проверка каждые 5 секунд (а также при запуске `--tray`, reload и снятии с паузы): автоматически возвращает `AutoConfigURL` (`http://127.0.0.1:28081/proxy.pac?v=2`), если внешний VPN сбросил настройки WinINet при отключении.
+  - Безопасно пропускает восстановление, пока активен внешний системный прокси (`ProxyEnable=1` / `PROXY_TYPE_PROXY`) или сторонний PAC-скрипт.
+- **Перепатч и тест подключения**:
+  - Восстановление Browser PAC добавлено в `Repatch()` (в GUI и `--cli repatch`).
+  - В `RunConnectivityTest()` добавлена строка статуса и авто-восстановления системного `Browser PAC`.
+- **Удаление хвостов `ag-proxy` v1.x**:
+  - `CleanupLegacyStartupEntries()` и `RemoveTrayAutostart()` теперь удаляют устаревшую запись `HKCU\Software\Microsoft\Windows\CurrentVersion\Run\AntigravityLocalProxy`, а `--tray` останавливает оставшиеся процессы `ag-proxy` перед привязкой портов.
+
+---
+
 ## `v2.0.0` — Открытый исходный код · Go + Wails v2 + встроенный `sing-box`
 
 Полный архитектурный перезапуск проекта на нативном **Go 1.27** (`CGO_ENABLED=0`) с GUI на **Wails v2 (WebView2)** и встроенным в процесс ядром **`sing-box v1.14.4`** без внешних бинарников, без PowerShell/C# и с полностью открытым исходным кодом в репозитории.

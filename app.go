@@ -508,7 +508,7 @@ func (a *App) Install(req InstallRequest) ActionResult {
 	if req.BrowserPAC {
 		a.setProgress(88, "Регистрация Browser PAC...")
 		a.setStep("pac", "active", "...")
-		pacURL := fmt.Sprintf("http://127.0.0.1:%d/proxy.pac?v=2", cfg.PACPort)
+		pacURL := pac.DefaultPACURL(cfg.PACPort)
 		if err := pac.EnableSystemPAC(pacURL, dataDir, cfg.PACPort); err != nil {
 			a.log("  [FAIL] PAC: " + err.Error())
 			a.setStep("pac", "fail", "ошибка")
@@ -602,6 +602,15 @@ func (a *App) Repatch(req InstallRequest) ActionResult {
 			a.log("  [OK] " + msg)
 		}
 	}
+	if req.BrowserPAC {
+		pacURL := pac.DefaultPACURL(cfg.PACPort)
+		if err := pac.EnableSystemPAC(pacURL, dataDir, cfg.PACPort); err != nil {
+			a.log("  [FAIL] PAC: " + err.Error())
+			issues++
+		} else {
+			a.log("  [OK] Browser PAC включён: " + pacURL)
+		}
+	}
 	if cnt := patcher.PatchShortcuts(dataDir, installedExe, req.Antigravity, req.OpenCode); cnt > 0 {
 		a.log(fmt.Sprintf("  [OK] Ярлыков обновлено: %d", cnt))
 	}
@@ -609,7 +618,7 @@ func (a *App) Repatch(req InstallRequest) ActionResult {
 }
 
 func (a *App) RunConnectivityTest() []engine.ConnectivityCheckItem {
-	cfg, _, _ := config.Load()
+	cfg, dataDir, _ := config.Load()
 	if !isLoopbackOpen(cfg.ProxyPort, 250*time.Millisecond) {
 		a.log(fmt.Sprintf("  [FAIL] Порт 127.0.0.1:%d не отвечает", cfg.ProxyPort))
 		return nil
@@ -626,6 +635,19 @@ func (a *App) RunConnectivityTest() []engine.ConnectivityCheckItem {
 			tag = "SKIP"
 		}
 		a.log(fmt.Sprintf("  [%s] %-24s %s (%d ms)", tag, it.Name, it.Detail, it.LatencyMs))
+	}
+	if cfg.Components.BrowserPAC {
+		pacURL := pac.DefaultPACURL(cfg.PACPort)
+		st := pac.QuerySystemPACState(cfg.PACPort)
+		if st.OurPACActive {
+			a.log(fmt.Sprintf("  [OK]   %-24s активен (%s)", "Browser PAC", pacURL))
+		} else if st.ExternalProxyActive {
+			a.log(fmt.Sprintf("  [WARN] %-24s переопределён внешним VPN/прокси", "Browser PAC"))
+		} else if restored, err := pac.EnsureSystemPAC(pacURL, dataDir, cfg.PACPort); err != nil {
+			a.log(fmt.Sprintf("  [FAIL] %-24s %v", "Browser PAC", err))
+		} else if restored {
+			a.log(fmt.Sprintf("  [OK]   %-24s восстановлен (был сброшен VPN/системой)", "Browser PAC"))
+		}
 	}
 	return items
 }

@@ -266,6 +266,7 @@ func runCLI(selfExe string, args []string) int {
 		app.logFn = func(s string) { fmt.Println(s) }
 		res := app.Repatch(InstallRequest{
 			Antigravity:   true,
+			BrowserPAC:    cfg.Components.BrowserPAC,
 			OpenCode:      true,
 			ClaudeDesktop: cfg.Components.ClaudeDesktop,
 			ClaudeBaseURL: cfg.ClaudeBaseURL,
