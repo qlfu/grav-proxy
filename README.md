@@ -4,11 +4,11 @@
 
 ![Version](https://img.shields.io/badge/version-v1.6.0-blue) ![Platform](https://img.shields.io/badge/platform-Windows%2010%2F11%20x64-lightgrey) ![License](https://img.shields.io/badge/license-MIT-green)
 
-Портативный однофайловый установщик локального прокси (`127.0.0.1:28080`) и локального PAC-маршрутизатора (`127.0.0.1:28081`) на базе `sing-box` (`1.14.4`, `windows/amd64`) для **Antigravity IDE**, **v0.app**, **Gemini Desktop**, **NotebookLM**, **OpenCode Desktop / CLI** и **Claude Desktop** на Windows 10/11 x64.
+Портативный однофайловый установщик локального прокси (`127.0.0.1:28080`) и локального PAC-маршрутизатора (`127.0.0.1:28081`) на базе `sing-box` (`1.14.4`, `windows/amd64`) для **Antigravity 2.0**, **v0.app**, **Gemini Desktop**, **NotebookLM**, **OpenCode Desktop / CLI** и **Claude Desktop** на Windows 10/11 x64.
 
 Готовый автономный файл [`GravProxy.exe`](./GravProxy.exe) доступен на странице [Releases](https://github.com/qlfu/grav-proxy/releases/latest) (`SHA-256` для `v1.6.0`: `C4DE07CA099C81E10AACED65AE135C8E8361C042ABA9C7668C8971BD2D5A949C`).
 
-> **English summary:** Portable single-file `sing-box` VLESS/PAC proxy and in-place patcher for **Antigravity IDE** (fixes `User location is not supported`), **Claude Desktop** (`egressProxyUrl` + `3p` API-key mode without admin rights), **Gemini Desktop**, **NotebookLM**, **v0.app**, and **OpenCode** on Windows 10/11 x64. Only AI domains go through the proxy; regular traffic stays `DIRECT`. Full English guide: [README.en.md](./README.en.md).
+> **English summary:** Portable single-file `sing-box` VLESS/PAC proxy and in-place patcher for **Antigravity 2.0** (fixes `User location is not supported`, `Agent execution terminated due to error.`, and `Your account is not eligible for Gemini Code Assist for individuals at this time` / `There was an unexpected issue setting up your account.`), **Claude Desktop** (`egressProxyUrl` + `3p` API-key mode without admin rights), **Gemini Desktop**, **NotebookLM**, **v0.app**, and **OpenCode** on Windows 10/11 x64 with GitHub auto-updates. Only AI domains go through the proxy; regular traffic stays `DIRECT`. Full English guide: [README.en.md](./README.en.md).
 
 <p align="center">
   <img src="./docs/installer-ui.png" alt="Интерфейс установщика GravProxy v1.6.0" width="760">
@@ -18,7 +18,11 @@
 
 ## Какие проблемы решает
 
-- **Ошибка `User location is not supported` в Antigravity IDE**: автоматически подбирает чистый узел **VLESS** (из клиента **Happ** или по подписке) через **Google GeoIP** и патчит `agy.exe` / `language_server*.exe` на месте с откатом через `backups\`.
+- **Ошибки `Antigravity 2.0`**:
+  - `User location is not supported`
+  - `Agent execution terminated due to error.`
+  - `There was an unexpected issue setting up your account.` (`Your account is not eligible for Gemini Code Assist for individuals at this time`)
+  Установщик автоматически подбирает чистый узел **VLESS** (из клиента **Happ** или по подписке) через **Google GeoIP** и патчит `agy.exe` / `language_server*.exe` на месте с откатом через `backups\` (если аккаунт или регион упираются в IP/маршрут к серверам Google).
 - **Claude Desktop на Windows без входа или с блокировкой региона**: прописывает локальный прокси (`egressProxyUrl = http://127.0.0.1:28080`) и при указании API-ключа (`sk-ant-...`, `sk-or-...` / шлюз) включает режим `deploymentMode: "3p"` без прав администратора.
 - **Доступ к Gemini Desktop, NotebookLM, v0.app и OpenCode без торможения остального интернета**: поднимает локальный PAC-сервер `http://127.0.0.1:28081/proxy.pac` (`sing-box`), который направляет в прокси **только целевые AI-домены** — игры, YouTube, браузер и обычный трафик идут `DIRECT`.
 
@@ -68,7 +72,7 @@
 2. **Прокси-сервер (VLESS / Happ)**:
    - Оставьте поле пустым для автоподхвата (`AG_PROXY_VLESS`, `AG_PROXY_SUB_URL` или Happ), либо нажмите **«Найти в Happ»**.
    - При шифровании `subs.db` в новых версиях Happ или блокировке подписки вставьте вручную ссылку подписки `https://...`, ключ `vless://...` или адрес локального прокси `socks5://127.0.0.1:10808` (при включённом Happ на Нидерландах/Польше).
-3. **Компоненты**: отметьте нужные пункты (`Значок в трее и автозапуск`, `Antigravity IDE`, `v0.app / Gemini Desktop / NotebookLM`, `OpenCode Desktop и CLI`, `Claude Desktop`). Для `Claude Desktop` при желании введите API-ключ, `Base URL` и выберите схему `Bearer` / `x-api-key`.
+3. **Компоненты**: отметьте нужные пункты (`Значок в трее и автозапуск`, `Antigravity IDE` для **Antigravity 2.0**, `v0.app / Gemini Desktop / NotebookLM`, `OpenCode Desktop и CLI`, `Claude Desktop`). Для `Claude Desktop` при желании введите API-ключ, `Base URL` и выберите схему `Bearer` / `x-api-key`.
 4. Нажмите **«Установить»** (или **«Перепатчить»** для повторной синхронизации патчей и настроек Claude Desktop без пересборки ключа прокси).
 5. Нажмите **«Проверить»**, чтобы протестировать внешний IP, Google GeoIP, Antigravity, v0.app, Gemini, NotebookLM, OpenCode, OpenRouter и Claude / Anthropic API.
 
@@ -79,7 +83,7 @@
 ## Использование после установки
 
 - **GravProxy**: открывайте прямо из значка в трее → **«Открыть GravProxy»**.
-- **Antigravity IDE** и **OpenCode Desktop**: запускайте через обычные ярлыки.
+- **Antigravity 2.0** и **OpenCode Desktop**: запускайте через обычные ярлыки.
 - **OpenCode CLI**: используйте `opencode`, `oc` или `opencode-proxy` в новом окне терминала.
 - **Claude Desktop**: запускайте из ярлыка или через **«Открыть Claude»** в трее.
 - **Gemini Desktop**: используйте обычный ярлык или `Alt+Space` (при активном прокси трафик идёт через PAC `:28081`).
@@ -156,8 +160,8 @@
 
 ## Частые вопросы
 
-**Ошибка региона Google API (`User location is not supported`)**
-Откройте меню трея → **«Подобрать сервер (Google GeoIP)»**, либо нажмите **«Найти в Happ»** и переустановите конфиг.
+**Ошибки региона и агента в Antigravity 2.0 (`User location is not supported`, `Agent execution terminated due to error.`, `Your account is not eligible for Gemini Code Assist for individuals at this time` / `There was an unexpected issue setting up your account.`)**
+Откройте меню трея → **«Подобрать сервер (Google GeoIP)»**, либо нажмите **«Найти в Happ»** и переустановите конфиг (убедитесь, что выбран чистый узел без блокировок Google — например Нидерланды, Германия, США или Польша). После смены узла перезапустите Antigravity 2.0.
 
 **Happ не определяется автоматически (`subs.db` зашифрован или подписка заблокирована провайдером)**
 Вставьте ссылку подписки `https://...` или `vless://...` вручную, либо включите Happ (например, Нидерланды/Польшу) и укажите `socks5://127.0.0.1:10808` (или `http://127.0.0.1:10809`).

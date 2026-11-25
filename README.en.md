@@ -4,7 +4,7 @@
 
 ![Version](https://img.shields.io/badge/version-v1.6.0-blue) ![Platform](https://img.shields.io/badge/platform-Windows%2010%2F11%20x64-lightgrey) ![License](https://img.shields.io/badge/license-MIT-green)
 
-A portable, single-file local proxy (`127.0.0.1:28080`) and PAC router (`127.0.0.1:28081`) installer powered by `sing-box` (`1.14.4`, `windows/amd64`) for **Antigravity IDE**, **v0.app**, **Gemini Desktop**, **NotebookLM**, **OpenCode Desktop / CLI**, and **Claude Desktop** on Windows 10/11 x64.
+A portable, single-file local proxy (`127.0.0.1:28080`) and PAC router (`127.0.0.1:28081`) installer powered by `sing-box` (`1.14.4`, `windows/amd64`) for **Antigravity 2.0**, **v0.app**, **Gemini Desktop**, **NotebookLM**, **OpenCode Desktop / CLI**, and **Claude Desktop** on Windows 10/11 x64.
 
 The standalone executable [`GravProxy.exe`](./GravProxy.exe) is available on the [Releases](https://github.com/qlfu/grav-proxy/releases/latest) page (`SHA-256` for `v1.6.0`: `C4DE07CA099C81E10AACED65AE135C8E8361C042ABA9C7668C8971BD2D5A949C`).
 
@@ -18,7 +18,11 @@ The standalone executable [`GravProxy.exe`](./GravProxy.exe) is available on the
 
 ## Problems Solved
 
-- **Fix `User location is not supported` in Antigravity IDE**: automatically picks a clean **VLESS** node (from **Happ** or your subscription URL) verified via **Google GeoIP** and patches `agy.exe` / `language_server*.exe` in-place with rollback backups in `backups\`.
+- **Fixes `Antigravity 2.0` errors**:
+  - `User location is not supported`
+  - `Agent execution terminated due to error.`
+  - `There was an unexpected issue setting up your account.` (`Your account is not eligible for Gemini Code Assist for individuals at this time`)
+  Automatically picks a clean **VLESS** node (from **Happ** or your subscription URL) verified via **Google GeoIP** and patches `agy.exe` / `language_server*.exe` in-place with rollback backups in `backups\`.
 - **Claude Desktop proxy & API-key mode (`3p`) on Windows**: writes `egressProxyUrl = http://127.0.0.1:28080` and optionally enables `deploymentMode: "3p"` (`sk-ant-...`, `sk-or-...`, or custom gateway) without administrator privileges.
 - **Unblock Gemini Desktop, NotebookLM, v0.app, and OpenCode without slowing down your internet**: serves a local `sing-box` PAC router at `http://127.0.0.1:28081/proxy.pac` so **only AI domains** go through the proxy while all other traffic stays `DIRECT`.
 
@@ -68,7 +72,7 @@ The standalone executable [`GravProxy.exe`](./GravProxy.exe) is available on the
 2. **Proxy Server (VLESS / Happ)**:
    - Leave the input blank for automatic detection (`AG_PROXY_VLESS`, `AG_PROXY_SUB_URL`, or Happ), or click **«Найти в Happ»** (*Detect in Happ*).
    - If newer Happ versions encrypt `subs.db` or your ISP blocks the subscription URL, paste your `https://...` subscription URL, `vless://...` key, or local proxy address `socks5://127.0.0.1:10808` (with Happ connected to Netherlands/Poland).
-3. **Components**: select what to configure (`Tray & Autostart`, `Antigravity IDE`, `v0.app / Gemini Desktop / NotebookLM`, `OpenCode Desktop & CLI`, `Claude Desktop`). For `Claude Desktop`, optionally enter an API key, `Base URL`, and toggle `Bearer` / `x-api-key`.
+3. **Components**: select what to configure (`Tray & Autostart`, `Antigravity 2.0` / `Antigravity IDE`, `v0.app / Gemini Desktop / NotebookLM`, `OpenCode Desktop & CLI`, `Claude Desktop`). For `Claude Desktop`, optionally enter an API key, `Base URL`, and toggle `Bearer` / `x-api-key`.
 4. Click **«Установить»** (*Install*) — or **«Перепатчить»** (*Repatch*) to re-sync patches and Claude Desktop settings without rebuilding the proxy key.
 5. Click **«Проверить»** (*Test*) to check external IP, Google GeoIP, Antigravity, v0.app, Gemini, NotebookLM, OpenCode, OpenRouter, and Claude / Anthropic API.
 
@@ -79,7 +83,7 @@ The standalone executable [`GravProxy.exe`](./GravProxy.exe) is available on the
 ## Usage After Installation
 
 - **GravProxy**: open anytime from the system tray icon → **«Открыть GravProxy»** (*Open GravProxy*).
-- **Antigravity IDE** & **OpenCode Desktop**: launch normally from your existing shortcuts.
+- **Antigravity 2.0** & **OpenCode Desktop**: launch normally from your existing shortcuts.
 - **OpenCode CLI**: run `opencode`, `oc`, or `opencode-proxy` in a new terminal window.
 - **Claude Desktop**: launch normally or via **«Открыть Claude»** (*Open Claude*) in the tray menu.
 - **Gemini Desktop**: launch normally or press `Alt+Space` (routes through PAC `:28081` while the proxy is active).
@@ -156,8 +160,8 @@ Passing any arguments starts [`GravProxy.exe`](./GravProxy.exe) in console mode:
 
 ## FAQ
 
-**Google API region error (`User location is not supported`)**
-Open the tray menu → **«Подобрать сервер (Google GeoIP)»** (*Select clean server*), or click **«Найти в Happ»** and reinstall the config.
+**Antigravity 2.0 region / agent / account errors (`User location is not supported`, `Agent execution terminated due to error.`, `Your account is not eligible for Gemini Code Assist for individuals at this time` / `There was an unexpected issue setting up your account.`)**
+Open the tray menu → **«Подобрать сервер (Google GeoIP)»** (*Select clean server*), or click **«Найти в Happ»** and reinstall the config using a clean node in a supported Google region (e.g., Netherlands, Germany, US, or Poland), then restart Antigravity 2.0.
 
 **Happ is not detected (`subs.db` encrypted or subscription blocked by ISP)**
 Paste the `https://...` subscription URL or `vless://...` key manually, or turn on Happ (e.g., Netherlands/Poland) and enter `socks5://127.0.0.1:10808` (or `http://127.0.0.1:10809`).
