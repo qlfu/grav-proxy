@@ -4,14 +4,14 @@
 
 ![Version](https://img.shields.io/badge/version-v2.0.0-blue) ![Stack](https://img.shields.io/badge/Go%201.27%20%2B%20Wails%20v2-sing--box%201.14.4-00ADD8) ![Platform](https://img.shields.io/badge/platform-Windows%2010%2F11%20x64-lightgrey) ![License](https://img.shields.io/badge/license-MIT%20%2F%20GPL--3.0-green)
 
-Fully open-source (**Open Source**) native single-binary local proxy (`127.0.0.1:28080`) and PAC router (`127.0.0.1:28081`) built with **Go + Wails v2 (WebView2)** and **in-process embedded `sing-box` (`v1.14.4`, `CGO_ENABLED=0`, `windows/amd64`)** for **Antigravity 2.0**, **v0.app**, **Gemini Desktop**, **NotebookLM**, **OpenCode Desktop / CLI**, and **Claude Desktop** on Windows 10/11 x64 — supporting both **VLESS / Happ** and built-in **SmartDNS (no-VPN)** mode.
+Fully open-source (**Open Source**) native single-binary local proxy (`127.0.0.1:28080`) and PAC router (`127.0.0.1:28081`) built with **Go + Wails v2 (WebView2)** and **in-process embedded `sing-box` (`v1.14.4`, `CGO_ENABLED=0`, `windows/amd64`)** for **Antigravity 2.0**, **Gemini Desktop**, **NotebookLM**, **OpenCode Desktop / CLI**, and **Claude Desktop** on Windows 10/11 x64 — supporting both **VLESS / Happ** and built-in **SmartDNS (no-VPN)** mode.
 
-Prebuilt [`GravProxy.exe`](https://github.com/qlfu/grav-proxy/releases/latest) binaries are published on GitHub [Releases](https://github.com/qlfu/grav-proxy/releases/latest) (`v2.0.0` SHA-256: `1AA262EEB7B8A543B8A08D9C8F0595D23370C1B59A5D1865A0F4687271274266`, `41,047,552` bytes).
+Prebuilt [`GravProxy.exe`](https://github.com/qlfu/grav-proxy/releases/latest) binaries are published on GitHub [Releases](https://github.com/qlfu/grav-proxy/releases/latest) (`v2.0.0` SHA-256: `A7E8CCA89BE8ECA726A39727B711D1DC1E7264D3CCC1B0C7CE6540473A7A4506`, `41,046,528` bytes).
 
 > Note: Installer and tray UI labels are currently in Russian; CLI flags and documentation are available in English below.
 
 <p align="center">
-  <img src="./docs/installer-ui.png" alt="GravProxy Installer UI" width="760">
+  <img src="./docs/installer-ui.png" alt="GravProxy v2.0.0 Installer UI" width="760">
 </p>
 
 ---
@@ -24,7 +24,7 @@ Prebuilt [`GravProxy.exe`](https://github.com/qlfu/grav-proxy/releases/latest) b
   - `There was an unexpected issue setting up your account.` (`Your account is not eligible for Gemini Code Assist for individuals at this time`)
   Automatically reads your **Happ** client or subscription URL, tests **every** VLESS node through in-process `sing-box` against **Google GeoIP** (reading the full 600+ KB `policies.google.com/terms` page), **NotebookLM**, and **Gemini** (filtering `/sorry`), picks the best clean node, and patches `agy.exe` / `language_server*.exe` in-place with rollback backups in `%LOCALAPPDATA%\GravProxy\backups\`.
 - **Claude Desktop proxy & API-key mode (`3p`) on Windows**: writes `egressProxyUrl = http://127.0.0.1:28080` across `%LOCALAPPDATA%\Claude-3p\configLibrary\` (including MSIX VFS and `%APPDATA%\Claude-3p`) and optionally configures `deploymentMode: "3p"` (`sk-ant-...`, `sk-or-...`, or custom gateway) without administrator rights.
-- **Unblock Gemini Desktop, NotebookLM, v0.app, and OpenCode without slowing down your internet**: serves a local PAC router at `http://127.0.0.1:28081/proxy.pac` so **only targeted AI domains** go through `:28080` while regular traffic stays `DIRECT`.
+- **Unblock Gemini Desktop, NotebookLM, and OpenCode without slowing down your internet**: serves a local PAC router at `http://127.0.0.1:28081/proxy.pac` so **only targeted AI domains** go through `:28080` while regular traffic stays `DIRECT`.
 
 ---
 
@@ -64,8 +64,8 @@ Key `v2.0.0` capabilities:
 2. Choose a mode:
    - **VLESS / Happ**: leave the input blank for auto-detection (Happ / `AG_PROXY_VLESS` / `AG_PROXY_SUB_URL`), click **«Найти в Happ»** (*Detect in Happ*), or paste a `vless://...` key, `https://...` subscription URL, or `socks5://127.0.0.1:10808`.
    - **SmartDNS (без VPN)**: pick **Авто** (*Auto*), **`DNS-AI`**, **`GeoHide EU`**, or a custom DoH/DoT/IPv4 resolver and click **«Проверить DNS»** (*Test DNS*) for live diagnostics.
-3. Select desired components (`Tray & Autostart`, `Antigravity 2.0`, `v0.app / Gemini Desktop / NotebookLM (PAC)`, `OpenCode Desktop & CLI`, `Claude Desktop`).
-4. Click **«Установить»** (*Install*) — running target apps are cleanly closed, `GravProxy.exe --tray` starts on `:28080` / `:28081`, binaries and shortcuts are patched, and all 9 connectivity checks run immediately.
+3. Select desired components (`Tray & Autostart`, `Antigravity 2.0`, `Gemini Desktop & NotebookLM (PAC)`, `OpenCode Desktop & CLI`, `Claude Desktop`).
+4. Click **«Установить»** (*Install*) — running target apps are cleanly closed, `GravProxy.exe --tray` starts on `:28080` / `:28081`, binaries and shortcuts are patched, and all 8 connectivity checks run immediately.
 
 ---
 

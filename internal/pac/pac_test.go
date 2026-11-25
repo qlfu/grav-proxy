@@ -17,12 +17,15 @@ func TestGeneratePACScriptIsolation(t *testing.T) {
 		"notebooklm.google.com",
 		"claude.ai",
 		"api.anthropic.com",
-		"v0.app",
+		"notebook.google.com",
 		"opencode.ai",
 	} {
 		if !strings.Contains(script, host) {
 			t.Fatalf("PAC script missing AI host %s", host)
 		}
+	}
+	if strings.Contains(script, "v0.app") || strings.Contains(script, "vercel.com") {
+		t.Fatal("PAC script must not include removed v0/vercel domains")
 	}
 	inactive := GeneratePACScript("127.0.0.1", 28080, nil, false)
 	if strings.Contains(inactive, "28080") {

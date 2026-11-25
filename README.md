@@ -4,14 +4,14 @@
 
 ![Version](https://img.shields.io/badge/version-v2.0.0-blue) ![Stack](https://img.shields.io/badge/Go%201.27%20%2B%20Wails%20v2-sing--box%201.14.4-00ADD8) ![Platform](https://img.shields.io/badge/platform-Windows%2010%2F11%20x64-lightgrey) ![License](https://img.shields.io/badge/license-MIT%20%2F%20GPL--3.0-green)
 
-Полностью открытый (**Open Source**) нативный однофайловый установщик локального прокси (`127.0.0.1:28080`) и PAC-маршрутизатора (`127.0.0.1:28081`) на **Go + Wails v2 (WebView2)** со встроенным в процесс ядром `sing-box` (`v1.14.4`, `CGO_ENABLED=0`, `windows/amd64`) для **Antigravity 2.0**, **v0.app**, **Gemini Desktop**, **NotebookLM**, **OpenCode Desktop / CLI** и **Claude Desktop** на Windows 10/11 x64 — с основным режимом **VLESS / Happ** и встроенным **SmartDNS (без VPN)**.
+Полностью открытый (**Open Source**) нативный однофайловый установщик локального прокси (`127.0.0.1:28080`) и PAC-маршрутизатора (`127.0.0.1:28081`) на **Go + Wails v2 (WebView2)** со встроенным в процесс ядром `sing-box` (`v1.14.4`, `CGO_ENABLED=0`, `windows/amd64`) для **Antigravity 2.0**, **Gemini Desktop**, **NotebookLM**, **OpenCode Desktop / CLI** и **Claude Desktop** на Windows 10/11 x64 — с основным режимом **VLESS / Happ** и встроенным **SmartDNS (без VPN)**.
 
-Готовый бинарник `GravProxy.exe` доступен на странице [Releases](https://github.com/qlfu/grav-proxy/releases/latest) (`v2.0.0` SHA-256: `1AA262EEB7B8A543B8A08D9C8F0595D23370C1B59A5D1865A0F4687271274266`, размер `41 047 552` байт).
+Готовый бинарник `GravProxy.exe` доступен на странице [Releases](https://github.com/qlfu/grav-proxy/releases/latest) (`v2.0.0` SHA-256: `A7E8CCA89BE8ECA726A39727B711D1DC1E7264D3CCC1B0C7CE6540473A7A4506`, размер `41 046 528` байт).
 
-> **English summary:** Open-source native **Go + Wails v2 (WebView2)** single-binary installer and tray proxy controller with **in-process embedded `sing-box v1.14.4`** (zero external `.exe` downloads, zero PowerShell/C# compilation, zero temp unpacking) for **Antigravity 2.0**, **Claude Desktop** (`egressProxyUrl` + `3p` API-key mode), **Gemini Desktop**, **NotebookLM**, **v0.app**, and **OpenCode** on Windows 10/11 x64. Supports **VLESS / Happ** and a built-in **SmartDNS IP-Health Filtering Relay** (no VPN). Full English guide: [README.en.md](./README.en.md).
+> **English summary:** Open-source native **Go + Wails v2 (WebView2)** single-binary installer and tray proxy controller with **in-process embedded `sing-box v1.14.4`** (zero external `.exe` downloads, zero PowerShell/C# compilation, zero temp unpacking) for **Antigravity 2.0**, **Claude Desktop** (`egressProxyUrl` + `3p` API-key mode), **Gemini Desktop**, **NotebookLM**, and **OpenCode** on Windows 10/11 x64. Supports **VLESS / Happ** and a built-in **SmartDNS IP-Health Filtering Relay** (no VPN). Full English guide: [README.en.md](./README.en.md).
 
 <p align="center">
-  <img src="./docs/installer-ui.png" alt="Интерфейс установщика GravProxy" width="760">
+  <img src="./docs/installer-ui.png" alt="Интерфейс установщика GravProxy v2.0.0" width="760">
 </p>
 
 ---
@@ -24,7 +24,7 @@
   - `There was an unexpected issue setting up your account.` (`Your account is not eligible for Gemini Code Assist for individuals at this time`)
   Установщик автоматически находит подписку/ключ в **Happ**, проверяет **каждый** VLESS-узел через встроенный `sing-box` по **Google GeoIP** (чтение полной 600+ КБ страницы `policies.google.com/terms`), **NotebookLM** и **Gemini** (с фильтрацией `/sorry`), выбирает чистый узел и патчит `agy.exe` / `language_server*.exe` на месте с бэкапом в `%LOCALAPPDATA%\GravProxy\backups\`.
 - **Claude Desktop на Windows без входа или с блокировкой региона**: прописывает `egressProxyUrl = http://127.0.0.1:28080` в `%LOCALAPPDATA%\Claude-3p\configLibrary\` (включая MSIX VFS и `%APPDATA%\Claude-3p`) и при указании API-ключа (`sk-ant-...`, `sk-or-...` / шлюз) включает режим `deploymentMode: "3p"` без прав администратора.
-- **Доступ к Gemini Desktop, NotebookLM, v0.app и OpenCode без торможения остального интернета**: встроенный HTTP PAC-сервер `http://127.0.0.1:28081/proxy.pac` направляет в прокси **только целевые AI-домены** — игры, YouTube и обычные сайты идут `DIRECT`.
+- **Доступ к Gemini Desktop, NotebookLM и OpenCode без торможения остального интернета**: встроенный HTTP PAC-сервер `http://127.0.0.1:28081/proxy.pac` направляет в прокси **только целевые AI-домены** — игры, YouTube и обычные сайты идут `DIRECT`.
 
 ---
 
@@ -64,8 +64,8 @@
 2. Выберите режим:
    - **VLESS / Happ**: оставьте поле пустым для автоподхвата (Happ / `AG_PROXY_VLESS` / `AG_PROXY_SUB_URL`), нажмите **«Найти в Happ»**, либо вставьте `vless://...`, подписку `https://...` или `socks5://127.0.0.1:10808`.
    - **SmartDNS (без VPN)**: выберите **«Авто»**, **`DNS-AI`**, **`GeoHide EU`** или свой DoH/DoT/IPv4; кнопкой **«Проверить DNS»** можно сразу увидеть, какие AI-сервисы открываются без VPN.
-3. Отметьте нужные компоненты (`Значок в трее и автозапуск`, `Antigravity 2.0`, `v0.app / Gemini Desktop / NotebookLM (PAC)`, `OpenCode Desktop и CLI`, `Claude Desktop`).
-4. Нажмите **«Установить»** — активные приложения из выбранных компонентов будут аккуратно закрыты перед патчем, запущен встроенный прокси `:28080`, пропатчены бинарники и ярлыки, и выполнена проверка всех 9 эндпоинтов.
+3. Отметьте нужные компоненты (`Значок в трее и автозапуск`, `Antigravity 2.0`, `Gemini Desktop и NotebookLM (PAC)`, `OpenCode Desktop и CLI`, `Claude Desktop`).
+4. Нажмите **«Установить»** — активные приложения из выбранных компонентов будут аккуратно закрыты перед патчем, запущен встроенный прокси `:28080`, пропатчены бинарники и ярлыки, и выполнена проверка всех 8 эндпоинтов.
 
 > Поддерживаются темы **Авто / Светлая / Тёмная** (сохраняются в `config.json`).
 
