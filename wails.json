@@ -1,0 +1,19 @@
+{
+  "$schema": "https://wails.io/schemas/config.v2.json",
+  "name": "GravProxy",
+  "outputfilename": "GravProxy.exe",
+  "frontend:install": "npm install",
+  "frontend:build": "npm run build",
+  "frontend:dev:watcher": "npm run dev",
+  "frontend:dev:serverUrl": "auto",
+  "author": {
+    "name": "qlfu"
+  },
+  "info": {
+    "companyName": "GravProxy",
+    "productName": "GravProxy",
+    "productVersion": "2.0.0",
+    "copyright": "MIT License",
+    "comments": "Local sing-box VLESS/PAC & SmartDNS proxy and patcher for AI tools on Windows"
+  }
+}

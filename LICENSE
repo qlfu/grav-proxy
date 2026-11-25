@@ -25,6 +25,6 @@ SOFTWARE.
 Third-Party Notice
 ------------------
 
-Release builds of GravProxy.exe bundle the upstream `sing-box` binary
-(`v1.14.4`, `windows/amd64`, https://github.com/SagerNet/sing-box), which is
+Release builds of GravProxy.exe statically link the upstream `sing-box`
+Go library (`v1.14.4`, https://github.com/SagerNet/sing-box), which is
 distributed under the GNU General Public License v3.0 or later (GPL-3.0-or-later).

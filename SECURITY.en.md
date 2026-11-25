@@ -2,49 +2,37 @@
 
 [Русский](./SECURITY.md) · **English**
 
-## Secret Storage
+## Open Source & Zero Telemetry
 
-`GravProxy.exe` and the files in this repository do not contain hardcoded VLESS keys, subscription URLs, API keys, or telemetry.
+Starting with `v2.0.0`, the full source code of `GravProxy` is open in `qlfu/grav-proxy` and compiles as pure Go (`CGO_ENABLED=0`) + Wails v2 with no custom packers, encrypted blobs, telemetry, hardcoded VLESS keys, subscription URLs, or API keys.
 
-All user credentials and runtime configurations are stored locally on your machine only:
+All user configuration and credentials stay strictly local on your machine:
 
-- VLESS key and subscription URL — in user environment variables `AG_PROXY_VLESS` and `AG_PROXY_SUB_URL`.
-- Generated `sing-box` configuration — in `%LOCALAPPDATA%\ag-proxy\sing-box.json`.
-- Claude Desktop `3p` profile and API keys — in `%LOCALAPPDATA%\Claude-3p\configLibrary\` (including MSIX VFS `Packages\Claude_*\LocalCache\Local\Claude-3p`).
+- Main configuration (`mode`, `endpointUrl`, `subscriptionUrl`, `smartDnsUrl`, selected components) — stored in `%LOCALAPPDATA%\GravProxy\config.json` (legacy `AG_PROXY_VLESS` / `AG_PROXY_SUB_URL` user env vars from `v1.x` are read for migration and removed on uninstall).
+- Loopback HTTP control token (`/_ctl/status`, `/_ctl/toggle`, `/_ctl/reload`, `/_ctl/recheck`, `/_ctl/stop` on `127.0.0.1:28081`, header `X-GravProxy-Token`) — stored in `%LOCALAPPDATA%\GravProxy\control.token` (128-bit locally generated CSPRNG token).
+- Claude Desktop `3p` profile and API keys — stored in `%LOCALAPPDATA%\Claude-3p\configLibrary\` (and MSIX VFS `Packages\Claude_*\LocalCache\Local\Claude-3p`).
 
-## Integrity & Package Protection (`GravProxy.exe`)
+## Integrity Verification (`GravProxy.exe`)
 
-Before running `GravProxy.exe`, verify its checksum:
-
-1. **Verify SHA-256**:
+Always verify the digest of downloaded binaries before running:
 
 ```powershell
 Get-FileHash .\GravProxy.exe -Algorithm SHA256
 ```
 
-Compare the output with the hash published on the [Releases](https://github.com/qlfu/grav-proxy/releases/latest) page (`v1.7.0`: `4993A8307245E526FA3A5921CCB0BF8492D26ABCA7F5BC2623B5BDCFFB321CD4`). The built-in auto-updater also verifies the downloaded `SHA-256` digest and `PE/EXE` header before launching updates.
+Verified `v2.0.0` SHA-256: `1AA262EEB7B8A543B8A08D9C8F0595D23370C1B59A5D1865A0F4687271274266` (also posted on [Releases](https://github.com/qlfu/grav-proxy/releases/latest)). The built-in auto-updater verifies GitHub HTTPS origin, `PE/EXE` (`MZ`) header, and `SHA-256` before replacing the running binary.
 
-2. **Encrypted runtime container & disk footprint**:
+You can also build an identical binary directly from this repository (see "Building from Source" in [README.en.md](./README.en.md)) or inspect GitHub Actions build artifacts.
 
-- Starting with `v1.6.0`, runtime components inside `GravProxy.exe` are stored in a custom binary container (`GravProxy.pkg`) compressed with raw `Deflate` and encrypted with per-build random `AES-256-CBC` + `HMAC-SHA256` keys. The executable contains no ZIP/archive headers and cannot be opened in 7-Zip, WinRAR, or `System.IO.Compression.ZipArchive`.
-- During installation, helper C# source files (`sing-box-bg.cs`, `proxy-tray.cs`, `ag_launch.cs`, `oc_launch.cs`) are no longer copied into `%LOCALAPPDATA%\ag-proxy\`, and any leftover `.cs` files from earlier versions are removed.
+## SmartScreen & Antivirus False Positives
 
-## Antivirus False Positives (`Sabsik.FL.A!ml`, etc.)
-
-Windows Defender and other antivirus engines may flag `GravProxy.exe` with machine-learning / heuristic detections such as `Trojan:Win32/Sabsik.FL.A!ml`, `Trojan:Win32/Wacatac.B!ml`, or similar `!ml` labels. This is a **false positive** caused by legitimate installer mechanics:
-
-1. **No commercial code-signing (EV/Authenticode) certificate** — unsigned binaries automatically trigger SmartScreen and stricter ML scoring.
-2. **High-entropy encrypted bundle (`GravProxy.pkg`)** and runtime extraction into `%TEMP%\ag-proxy-sfx-*`.
-3. **Behavior heuristics**: compiling local helpers via built-in `csc.exe`, patching Antigravity binaries in-place (with rollback backups), registering autostart in `HKCU\Software\Microsoft\Windows\CurrentVersion\Run`, and enabling a local PAC server (`127.0.0.1:28081`).
-
-**Recommended steps:**
-- Always download `GravProxy.exe` from [Releases](https://github.com/qlfu/grav-proxy/releases/latest) and verify its digest using `Get-FileHash .\GravProxy.exe -Algorithm SHA256`.
-- Once the hash matches the published release (`v1.7.0`: `4993A8307245E526FA3A5921CCB0BF8492D26ABCA7F5BC2623B5BDCFFB321CD4`), add `GravProxy.exe` and `%LOCALAPPDATA%\ag-proxy` to Windows Security exclusions (`Virus & threat protection → Manage settings → Exclusions`) if Defender blocks execution.
+- `GravProxy.exe` is not signed with a commercial EV/Authenticode certificate, so Windows Defender SmartScreen may display *"Windows protected your PC"* on first launch — click **More info → Run anyway** after verifying the `SHA-256` checksum.
+- Starting with `v2.0.0`, `GravProxy.exe` **no longer** extracts SFX packages into `%TEMP%`, invokes PowerShell, or runs `csc.exe` at runtime, sharply reducing heuristic detections. If any AV flags `HKCU\...\Run` registration or in-place binary patching, verify `SHA-256` and whitelist `%LOCALAPPDATA%\GravProxy` if desired.
 
 ## Privacy in SmartDNS Mode (No-VPN)
 
-When using `SmartDNS` mode (`eu.geohide.ru`, `us.geohide.ru`, `dns.malw.link`, `dns.commonnet.work`, or a custom DoH/DoT server), **no root CA certificates** are installed and TLS traffic stays encrypted end-to-end (the SNI proxy cannot read request/response contents). However, the third-party SmartDNS operator can observe which targeted AI hostnames are queried/connected to and your external IP address. Non-AI traffic goes `DIRECT` and never touches the SmartDNS resolver.
+In `SmartDNS` mode (`dns.dns-ai.ru`, `eu.geohide.ru`, `us.geohide.ru`, `dns.malw.link`, `dns.commonnet.work`, or a custom DoH/DoT server), **no root CA certificates** are installed and TLS traffic remains encrypted end-to-end (the SNI proxy cannot read request/response payloads). The chosen SmartDNS operator can technically observe queried AI hostnames, SNI names, and your IP address; non-AI traffic goes `DIRECT` over your default DNS.
 
 ## Reporting Vulnerabilities
 
-Please report security issues via **GitHub Security Advisories** or Issues in `qlfu/grav-proxy`. Do not include real VLESS URIs, subscription URLs, API keys, or token-bearing logs in public reports.
+Report security issues via **GitHub Security Advisories** or Issues in `qlfu/grav-proxy`. Never include real VLESS URIs, subscription URLs, API keys, or `control.token` values in public reports.

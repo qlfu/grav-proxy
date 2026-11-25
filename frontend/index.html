@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GravProxy</title>
+  <link rel="stylesheet" href="./src/style.css" />
+</head>
+<body data-theme="dark">
+  <div class="window">
+    <header class="titlebar">
+      <div class="title-left">
+        <svg class="logo" width="14" height="14" viewBox="0 0 14 14" fill="none">
+          <path d="M 7,2 L 12.5,12 L 1.5,12 Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+        </svg>
+        <span class="brand-title">GravProxy</span>
+        <span id="version-label" class="brand-sub">Установщик · v2.0.0</span>
+        <button id="btn-update" class="title-tab title-update hidden" type="button" title="Нажмите, чтобы скачать и запустить обновление GravProxy"></button>
+      </div>
+      <div class="title-right">
+        <button class="title-tab" data-theme-btn="auto" type="button">Авто</button>
+        <button class="title-tab" data-theme-btn="light" type="button">Светлая</button>
+        <button class="title-tab" data-theme-btn="dark" type="button">Тёмная</button>
+        <span class="title-sep"></span>
+        <button id="btn-minimize" class="caption-btn" type="button" title="Свернуть">
+          <svg width="10" height="9" viewBox="0 0 10 9"><path d="M 0,4.5 L 10,4.5" stroke="currentColor" stroke-width="1.1"/></svg>
+        </button>
+        <button id="btn-close" class="caption-btn caption-close" type="button" title="Закрыть">
+          <svg width="10" height="10" viewBox="0 0 10 10"><path d="M 0.5,0.5 L 9.5,9.5 M 9.5,0.5 L 0.5,9.5" stroke="currentColor" stroke-width="1.1"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <main class="content">
+      <section class="left-pane">
+        <div class="mode-section">
+          <div class="mode-header">
+            <div class="mode-tabs">
+              <span class="section-label">Режим работы</span>
+              <button class="seg-tab active" data-mode="vless" type="button">VLESS / Happ</button>
+              <button class="seg-tab" data-mode="smartdns" type="button">SmartDNS (без VPN)</button>
+            </div>
+            <span id="txt-source-tag" class="mono-tag"></span>
+          </div>
+
+          <div id="panel-vless" class="mode-body">
+            <div class="input-row">
+              <input id="txt-vless" class="clean-input" type="text" placeholder="vless://..., подписка https:// или оставить пустым" />
+              <button id="btn-detect-happ" class="sec-btn" type="button">Найти в Happ</button>
+            </div>
+          </div>
+
+          <div id="panel-smartdns" class="mode-body hidden">
+            <div class="sd-row">
+              <div class="sd-presets">
+                <button class="seg-tab active" data-sd-url="smartdns://auto" type="button">Авто</button>
+                <button class="seg-tab" data-sd-url="smartdns://https://dns.dns-ai.ru/dns-query" type="button">DNS-AI</button>
+                <button class="seg-tab" data-sd-url="smartdns://https://eu.geohide.ru/dns-query" type="button">GeoHide EU</button>
+                <button class="seg-tab" data-sd-url="smartdns://https://us.geohide.ru/dns-query" type="button">GeoHide US</button>
+                <button class="seg-tab" data-sd-url="smartdns://https://dns.malw.link/dns-query" type="button">MalwDNS</button>
+                <button class="seg-tab" data-sd-url="smartdns://https://dns.commonnet.work/dns-query" type="button">CommonNet</button>
+                <button class="seg-tab" data-sd-url="custom" type="button">Свой</button>
+              </div>
+              <button id="btn-test-sd" class="sec-btn sec-btn-sm" type="button">Проверить DNS</button>
+            </div>
+            <input id="txt-smartdns" class="clean-input sd-custom hidden" type="text" placeholder="https://.../dns-query, tls://host или IP" />
+            <p class="sd-notice">Без VPS и прав админа (только AI-домены через sing-box). Публичные SmartDNS менее стабильны, чем VLESS.</p>
+          </div>
+
+          <div class="status-line">
+            <span id="dot-endpoint" class="dot"></span>
+            <span id="txt-endpoint-status" class="status-line-text">Проверка конфигурации...</span>
+          </div>
+        </div>
+
+        <div class="components-section">
+          <div class="comp-head">
+            <span class="section-label">Компоненты</span>
+            <span id="txt-comp-count" class="mono-tag">4 / 5</span>
+          </div>
+
+          <div class="comp-list">
+            <label class="comp-item">
+              <input id="chk-tray" type="checkbox" checked />
+              <span class="chk-box"></span>
+              <span class="comp-copy">
+                <span class="comp-title">Значок в трее и автозапуск</span>
+                <span class="comp-desc">Управление прокси из области уведомлений и запуск при входе в Windows</span>
+              </span>
+            </label>
+            <div class="divider"></div>
+
+            <label class="comp-item">
+              <input id="chk-ag" type="checkbox" checked />
+              <span class="chk-box"></span>
+              <span class="comp-copy">
+                <span class="comp-title">Antigravity 2.0</span>
+                <span class="comp-desc">Патч на месте, автоперепатч при запуске и резервная копия в GravProxy\backups</span>
+              </span>
+            </label>
+            <div class="divider"></div>
+
+            <label class="comp-item">
+              <input id="chk-pac" type="checkbox" checked />
+              <span class="chk-box"></span>
+              <span class="comp-copy">
+                <span class="comp-title">v0.app, Gemini Desktop и NotebookLM (PAC)</span>
+                <span class="comp-desc">Локальный PAC-маршрут для Chrome, Edge и приложения Gemini Desktop</span>
+              </span>
+            </label>
+            <div class="divider"></div>
+
+            <label class="comp-item">
+              <input id="chk-oc" type="checkbox" checked />
+              <span class="chk-box"></span>
+              <span class="comp-copy">
+                <span class="comp-title">OpenCode Desktop и CLI</span>
+                <span class="comp-desc">Оригинальный ярлык, проверка сервиса и команды opencode / oc в PATH</span>
+              </span>
+            </label>
+            <div class="divider"></div>
+
+            <label class="comp-item">
+              <input id="chk-claude" type="checkbox" />
+              <span class="chk-box"></span>
+              <span class="comp-copy">
+                <span class="comp-title">Claude Desktop (API-ключ и прокси)</span>
+                <span class="comp-desc">Прокси 127.0.0.1:28080 (egressProxyUrl + PAC) и режим API-ключа без входа в аккаунт Anthropic</span>
+              </span>
+            </label>
+
+            <div id="panel-claude-inputs" class="claude-inputs hidden">
+              <div class="claude-grid">
+                <input id="txt-claude-key" class="clean-input input-sm" type="password" placeholder="API-ключ (sk-ant-... / шлюз · опционально)" />
+                <input id="txt-claude-base" class="clean-input input-sm" type="text" placeholder="Base URL (опционально)" />
+              </div>
+              <div class="claude-meta">
+                <span id="txt-claude-status" class="claude-status"></span>
+                <button id="btn-claude-scheme" class="link-btn" type="button">Схема: Bearer</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <aside class="right-pane">
+        <div class="sidebar-info">
+          <div class="info-row">
+            <span class="info-label">Состояние</span>
+            <span class="info-value state-wrap">
+              <span id="dot-install-state" class="sq-dot"></span>
+              <span id="txt-install-state">Проверка...</span>
+            </span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Локальный порт</span>
+            <span id="txt-local-port" class="info-mono">127.0.0.1:28080</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Каталог</span>
+            <span class="info-dir-wrap">
+              <span id="txt-target-path" class="info-dir">AppData\Local\GravProxy</span>
+              <button id="btn-open-folder" class="link-btn" type="button">Открыть</button>
+            </span>
+          </div>
+        </div>
+
+        <div class="sidebar-exec">
+          <div class="exec-tabs-bar">
+            <div class="exec-tabs">
+              <button id="btn-tab-steps" class="exec-tab active" type="button">Этапы</button>
+              <button id="btn-tab-log" class="exec-tab" type="button">Журнал</button>
+            </div>
+            <span id="txt-progress-header" class="progress-label">Ожидание</span>
+          </div>
+
+          <div class="prog-wrap">
+            <div id="prog-bar" class="prog-bar" style="width: 0%"></div>
+          </div>
+
+          <div id="panel-steps" class="panel-steps">
+            <ul class="steps-list">
+              <li class="step-row" data-step="files"><span class="step-dot"></span><span class="step-title">Файлы и конфиг</span><span class="step-status"></span></li>
+              <li class="step-row" data-step="tray"><span class="step-dot"></span><span class="step-title">Автозапуск и прокси</span><span class="step-status"></span></li>
+              <li class="step-row" data-step="patch"><span class="step-dot"></span><span class="step-title">Патч Antigravity</span><span class="step-status"></span></li>
+              <li class="step-row" data-step="opencode"><span class="step-dot"></span><span class="step-title">OpenCode и PATH</span><span class="step-status"></span></li>
+              <li class="step-row" data-step="claude"><span class="step-dot"></span><span class="step-title">Claude Desktop</span><span class="step-status"></span></li>
+              <li class="step-row" data-step="pac"><span class="step-dot"></span><span class="step-title">Ярлыки и браузер (PAC)</span><span class="step-status"></span></li>
+              <li class="step-row" data-step="tests"><span class="step-dot"></span><span class="step-title">Проверка подключения</span><span class="step-status"></span></li>
+            </ul>
+
+            <button id="btn-log-preview" class="log-preview-btn" type="button" title="Открыть полный журнал">
+              <span id="txt-last-log" class="last-log-text">Журнал пуст</span>
+              <span class="log-arrow">Лог →</span>
+            </button>
+          </div>
+
+          <div id="panel-log" class="log-drawer hidden">
+            <div class="log-drawer-head">
+              <span>Вывод</span>
+              <button id="btn-copy-log" class="link-btn" type="button">Копировать</button>
+            </div>
+            <pre id="txt-log" class="log-pre"></pre>
+          </div>
+        </div>
+      </aside>
+    </main>
+
+    <footer class="footerbar">
+      <div class="footer-left">
+        <button id="btn-test" class="sec-btn" type="button">Проверить</button>
+        <button id="btn-repatch" class="sec-btn" type="button">Перепатчить</button>
+        <span class="footer-sep"></span>
+        <button id="btn-uninstall" class="danger-btn" type="button">Удалить</button>
+      </div>
+      <button id="btn-install" class="primary-btn" type="button">Установить</button>
+    </footer>
+  </div>
+
+  <script type="module" src="./src/main.js"></script>
+</body>
+</html>

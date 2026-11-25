@@ -1,0 +1,54 @@
+name: Build & Test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test-and-build:
+    runs-on: windows-latest
+    env:
+      CGO_ENABLED: "0"
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Build frontend
+        working-directory: frontend
+        run: |
+          npm ci || npm install
+          npm run build
+
+      - name: Run unit tests
+        run: go test -short -count=1 -tags "with_utls,with_quic" ./...
+
+      - name: Install Wails CLI
+        run: go install github.com/wailsapp/wails/v2/cmd/wails@v2.17.1
+
+      - name: Build single-file GravProxy.exe
+        run: |
+          wails build -clean -platform windows/amd64 -tags "with_utls,with_quic" -ldflags "-s -w" -skipbindings
+          $exe = Get-Item .\build\bin\GravProxy.exe
+          $hash = (Get-FileHash $exe.FullName -Algorithm SHA256).Hash
+          Write-Output "Built GravProxy.exe ($($exe.Length) bytes) SHA-256: $hash"
+          $hash | Out-File -FilePath .\build\bin\GravProxy.exe.sha256 -Encoding ascii
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: GravProxy-windows-amd64
+          path: |
+            build/bin/GravProxy.exe
+            build/bin/GravProxy.exe.sha256
