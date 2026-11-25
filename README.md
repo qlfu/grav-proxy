@@ -2,16 +2,16 @@
 
 **Русский** · [English](./README.en.md)
 
-![Version](https://img.shields.io/badge/version-v1.6.0-blue) ![Platform](https://img.shields.io/badge/platform-Windows%2010%2F11%20x64-lightgrey) ![License](https://img.shields.io/badge/license-MIT-green)
+![Version](https://img.shields.io/badge/version-v1.7.0-blue) ![Platform](https://img.shields.io/badge/platform-Windows%2010%2F11%20x64-lightgrey) ![License](https://img.shields.io/badge/license-MIT-green)
 
-Портативный однофайловый установщик локального прокси (`127.0.0.1:28080`) и локального PAC-маршрутизатора (`127.0.0.1:28081`) на базе `sing-box` (`1.14.4`, `windows/amd64`) для **Antigravity 2.0**, **v0.app**, **Gemini Desktop**, **NotebookLM**, **OpenCode Desktop / CLI** и **Claude Desktop** на Windows 10/11 x64.
+Портативный однофайловый установщик локального прокси (`127.0.0.1:28080`) и локального PAC-маршрутизатора (`127.0.0.1:28081`) на базе `sing-box` (`1.14.4`, `windows/amd64`) для **Antigravity 2.0**, **v0.app**, **Gemini Desktop**, **NotebookLM**, **OpenCode Desktop / CLI** и **Claude Desktop** на Windows 10/11 x64 — с основным режимом **VLESS / Happ** и альтернативным режимом **SmartDNS (без VPS/VPN)**.
 
-Готовый автономный файл [`GravProxy.exe`](./GravProxy.exe) доступен на странице [Releases](https://github.com/qlfu/grav-proxy/releases/latest) (`SHA-256` для `v1.6.0`: `C4DE07CA099C81E10AACED65AE135C8E8361C042ABA9C7668C8971BD2D5A949C`).
+Готовый автономный файл [`GravProxy.exe`](./GravProxy.exe) доступен на странице [Releases](https://github.com/qlfu/grav-proxy/releases/latest) (`SHA-256` для `v1.7.0`: `4993A8307245E526FA3A5921CCB0BF8492D26ABCA7F5BC2623B5BDCFFB321CD4`).
 
-> **English summary:** Portable single-file `sing-box` VLESS/PAC proxy and in-place patcher for **Antigravity 2.0** (fixes `User location is not supported`, `Agent execution terminated due to error.`, and `Your account is not eligible for Gemini Code Assist for individuals at this time` / `There was an unexpected issue setting up your account.`), **Claude Desktop** (`egressProxyUrl` + `3p` API-key mode without admin rights), **Gemini Desktop**, **NotebookLM**, **v0.app**, and **OpenCode** on Windows 10/11 x64 with GitHub auto-updates. Only AI domains go through the proxy; regular traffic stays `DIRECT`. Full English guide: [README.en.md](./README.en.md).
+> **English summary:** Portable single-file `sing-box` VLESS/PAC & **SmartDNS (no-VPN)** proxy and in-place patcher for **Antigravity 2.0** (fixes `User location is not supported`, `Agent execution terminated due to error.`, and `Your account is not eligible for Gemini Code Assist for individuals at this time` / `There was an unexpected issue setting up your account.`), **Claude Desktop** (`egressProxyUrl` + `3p` API-key mode without admin rights), **Gemini Desktop**, **NotebookLM**, **v0.app**, and **OpenCode** on Windows 10/11 x64 with GitHub auto-updates. Only AI domains go through the proxy/SmartDNS; regular traffic stays `DIRECT`. Full English guide: [README.en.md](./README.en.md).
 
 <p align="center">
-  <img src="./docs/installer-ui.png" alt="Интерфейс установщика GravProxy v1.6.0" width="760">
+  <img src="./docs/installer-ui.png" alt="Интерфейс установщика GravProxy v1.7.0" width="760">
 </p>
 
 ---
@@ -35,6 +35,10 @@
   - Находит ключ или подписку из клиента **Happ** (`subscription_log.txt`, конфиги/реестр Happ) или переменных `AG_PROXY_VLESS` / `AG_PROXY_SUB_URL`.
   - Поддерживает прямой upstream-режим `socks5://...` / `http://...` (например, `socks5://127.0.0.1:10808` при включённом Happ) и автоматически переключается на локальный прокси Happ, если подписка блокируется провайдером.
   - Тестирует серверы через реальный `sing-box` на **Google GeoIP** (отсеивая FakeIP и неподдерживаемые регионы) и выбирает узел с минимальной задержкой.
+- **Режим SmartDNS (работа без VPS и без VPN)**:
+  - Переключатель **VLESS / Happ** | **SmartDNS (без VPN)** прямо в окне установщика и через `-SmartDns` / `-SmartDnsUrl` в CLI.
+  - В отличие от системных DNS-патчеров (NRPT / `hosts`), DoH-резолвер (`eu.geohide.ru`, `us.geohide.ru`, `dns.malw.link`, `dns.commonnet.work` или свой DoH/DoT/IP) работает **внутри `sing-box`**, **без прав администратора**, не трогает системный DNS Windows и маршрутизирует только AI-домены через `:28080` и PAC `:28081`.
+  - Включает живую кнопку **«Проверить DNS»**, автоподбор рабочего SmartDNS и авто-failover в трее. *(Замечание: публичные SmartDNS зависят от доступности сторонних SNI-узлов и могут покрывать не все домены — например `v0.app` или часть API-эндпоинтов — поэтому для максимальной стабильности рекомендуется `VLESS / Happ`.)*
 - **Патч оригинальных программ на месте (без дубликатов)**:
   - Патчит `agy.exe` и `language_server*.exe` на месте, сохраняя оригиналы и SHA-256 манифест в `%LOCALAPPDATA%\ag-proxy\backups\`.
   - Настраивает оригинальные ярлыки Antigravity и OpenCode (Рабочий стол, «Пуск», панель задач) через лаунчеры `ag_launch.exe` / `oc_launch.exe` с сохранением иконок.
@@ -114,13 +118,19 @@
 
 # Полное удаление и откат
 .\GravProxy.exe -Uninstall
+
+# Установка в режиме SmartDNS (без VPS/VPN)
+.\GravProxy.exe -SmartDns
+.\GravProxy.exe -SmartDnsUrl "https://eu.geohide.ru/dns-query"
 ```
 
 | Параметр | Описание |
 | --- | --- |
 | `-TargetRoot <путь>` | Каталог установки (по умолчанию `%LOCALAPPDATA%\ag-proxy`) |
-| `-VlessUrl <url>` | Ссылка `vless://...`, `socks5://...`, `http://...` или URL подписки `https://...` |
+| `-VlessUrl <url>` | Ссылка `vless://...`, `socks5://...`, `http://...`, `smartdns://...` или URL подписки `https://...` |
 | `-SubUrl <url>` | URL подписки `https://...` с автоподбором чистого сервера Google GeoIP |
+| `-SmartDns` | Включить режим SmartDNS с автоподбором рабочего сервера (без VPS/VPN) |
+| `-SmartDnsUrl <url>` | Явный SmartDNS (`auto`, `https://.../dns-query`, `tls://...`, IPv4) |
 | `-ClaudeApiKey <key>` | API-ключ Claude Desktop (`sk-ant-...`, `sk-or-...` или ключ шлюза) |
 | `-ClaudeBaseUrl <url>` | Свой URL шлюза `inferenceGatewayBaseUrl` для Claude Desktop |
 | `-ClaudeAuthScheme <scheme>` | Схема авторизации шлюза: `bearer` (по умолчанию) или `x-api-key` |
@@ -154,7 +164,7 @@
 
 - **Нет встроенных ключей и телеметрии**: подробности о хранении данных, проверке `SHA-256` и защите встроенного контейнера `GravProxy.exe` приведены в [SECURITY.md](./SECURITY.md).
 - **Windows Defender SmartScreen**: бинарник `GravProxy.exe` не подписан коммерческим EV-сертификатом, поэтому при первом запуске Windows может показать предупреждение *«Система Windows защитила ваш компьютер»* — нажмите **«Подробнее» → «Выполнить в любом случае»** (предварительно сверьте `SHA-256` файла со страницей Releases).
-- **Ложные срабатывания антивируса (`Trojan:Win32/Sabsik.FL.A!ml`, `Wacatac.B!ml` и др.)**: ML-движок Защитника Windows и некоторых антивирусов иногда помечает неподписанный однофайловый установщик с шифрованным ресурсом (`GravProxy.pkg`), распаковкой во временную папку `%TEMP%\ag-proxy-sfx-*` и сборкой вспомогательных лаунчеров через `csc.exe` эвристическими вердиктами класса `!ml`. Это ложное срабатывание (false positive). Сверьте `SHA-256` скачанного файла со значением из Releases (`v1.6.0`: `C4DE07CA099C81E10AACED65AE135C8E8361C042ABA9C7668C8971BD2D5A949C`) и при необходимости добавьте файл или папку `%LOCALAPPDATA%\ag-proxy` в исключения Безопасности Windows.
+- **Ложные срабатывания антивируса (`Trojan:Win32/Sabsik.FL.A!ml`, `Wacatac.B!ml` и др.)**: ML-движок Защитника Windows и некоторых антивирусов иногда помечает неподписанный однофайловый установщик с шифрованным ресурсом (`GravProxy.pkg`), распаковкой во временную папку `%TEMP%\ag-proxy-sfx-*` и сборкой вспомогательных лаунчеров через `csc.exe` эвристическими вердиктами класса `!ml`. Это ложное срабатывание (false positive). Сверьте `SHA-256` скачанного файла со значением из Releases (`v1.7.0`: `4993A8307245E526FA3A5921CCB0BF8492D26ABCA7F5BC2623B5BDCFFB321CD4`) и при необходимости добавьте файл или папку `%LOCALAPPDATA%\ag-proxy` в исключения Безопасности Windows.
 
 ---
 

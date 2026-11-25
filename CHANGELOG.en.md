@@ -2,6 +2,14 @@
 
 [Русский](./CHANGELOG.md) · **English**
 
+## `v1.7.0`
+
+- **Built-in SmartDNS (no-VPN / no-VPS) mode inside `sing-box`**:
+  - Added a **`VLESS / Happ` | `SmartDNS (без VPN)`** mode toggle in the installer GUI and CLI (`-SmartDns`, `-SmartDnsUrl`), featuring live-tested DoH presets (**`GeoHide EU`**, **`GeoHide US`**, **`MalwDNS`**, **`CommonNet`**), automatic selection, and custom DoH/DoT/IPv4 input.
+  - Unlike system-wide DNS patchers, DoH resolution runs strictly inside `sing-box` (`domain_resolver`) for targeted AI traffic on `:28080` and PAC `:28081` — **no admin privileges** required and Windows system DNS, `hosts`, and NRPT stay untouched.
+  - Added live DNS preset testing (**«Проверить DNS»**), SmartDNS status & connectivity checks in `proxy-tray.exe` / GUI, `sing-box-bg.exe` support (`-SkipTray`), and automatic tray failover across the SmartDNS pool.
+- **Updated for `Antigravity 2.0`**: refreshed UI labels, probes, and documentation.
+
 ## `v1.6.0`
 
 - **Cleaner install directory**: helper C# source files (`sing-box-bg.cs`, `proxy-tray.cs`, `ag_launch.cs`, `oc_launch.cs`) are no longer copied into `%LOCALAPPDATA%\ag-proxy\`, and leftover `.cs` files from earlier versions are removed.

@@ -22,7 +22,7 @@ Before running `GravProxy.exe`, verify its checksum:
 Get-FileHash .\GravProxy.exe -Algorithm SHA256
 ```
 
-Compare the output with the hash published on the [Releases](https://github.com/qlfu/grav-proxy/releases/latest) page (`v1.6.0`: `C4DE07CA099C81E10AACED65AE135C8E8361C042ABA9C7668C8971BD2D5A949C`). The built-in auto-updater also verifies the downloaded `SHA-256` digest and `PE/EXE` header before launching updates.
+Compare the output with the hash published on the [Releases](https://github.com/qlfu/grav-proxy/releases/latest) page (`v1.7.0`: `4993A8307245E526FA3A5921CCB0BF8492D26ABCA7F5BC2623B5BDCFFB321CD4`). The built-in auto-updater also verifies the downloaded `SHA-256` digest and `PE/EXE` header before launching updates.
 
 2. **Encrypted runtime container & disk footprint**:
 
@@ -39,7 +39,11 @@ Windows Defender and other antivirus engines may flag `GravProxy.exe` with machi
 
 **Recommended steps:**
 - Always download `GravProxy.exe` from [Releases](https://github.com/qlfu/grav-proxy/releases/latest) and verify its digest using `Get-FileHash .\GravProxy.exe -Algorithm SHA256`.
-- Once the hash matches the published release (`v1.6.0`: `C4DE07CA099C81E10AACED65AE135C8E8361C042ABA9C7668C8971BD2D5A949C`), add `GravProxy.exe` and `%LOCALAPPDATA%\ag-proxy` to Windows Security exclusions (`Virus & threat protection → Manage settings → Exclusions`) if Defender blocks execution.
+- Once the hash matches the published release (`v1.7.0`: `4993A8307245E526FA3A5921CCB0BF8492D26ABCA7F5BC2623B5BDCFFB321CD4`), add `GravProxy.exe` and `%LOCALAPPDATA%\ag-proxy` to Windows Security exclusions (`Virus & threat protection → Manage settings → Exclusions`) if Defender blocks execution.
+
+## Privacy in SmartDNS Mode (No-VPN)
+
+When using `SmartDNS` mode (`eu.geohide.ru`, `us.geohide.ru`, `dns.malw.link`, `dns.commonnet.work`, or a custom DoH/DoT server), **no root CA certificates** are installed and TLS traffic stays encrypted end-to-end (the SNI proxy cannot read request/response contents). However, the third-party SmartDNS operator can observe which targeted AI hostnames are queried/connected to and your external IP address. Non-AI traffic goes `DIRECT` and never touches the SmartDNS resolver.
 
 ## Reporting Vulnerabilities
 

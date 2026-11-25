@@ -2,16 +2,16 @@
 
 [Русский](./README.md) · **English**
 
-![Version](https://img.shields.io/badge/version-v1.6.0-blue) ![Platform](https://img.shields.io/badge/platform-Windows%2010%2F11%20x64-lightgrey) ![License](https://img.shields.io/badge/license-MIT-green)
+![Version](https://img.shields.io/badge/version-v1.7.0-blue) ![Platform](https://img.shields.io/badge/platform-Windows%2010%2F11%20x64-lightgrey) ![License](https://img.shields.io/badge/license-MIT-green)
 
-A portable, single-file local proxy (`127.0.0.1:28080`) and PAC router (`127.0.0.1:28081`) installer powered by `sing-box` (`1.14.4`, `windows/amd64`) for **Antigravity 2.0**, **v0.app**, **Gemini Desktop**, **NotebookLM**, **OpenCode Desktop / CLI**, and **Claude Desktop** on Windows 10/11 x64.
+A portable, single-file local proxy (`127.0.0.1:28080`) and PAC router (`127.0.0.1:28081`) installer powered by `sing-box` (`1.14.4`, `windows/amd64`) for **Antigravity 2.0**, **v0.app**, **Gemini Desktop**, **NotebookLM**, **OpenCode Desktop / CLI**, and **Claude Desktop** on Windows 10/11 x64 — supporting both **VLESS / Happ** and a built-in **SmartDNS (no-VPN)** mode.
 
-The standalone executable [`GravProxy.exe`](./GravProxy.exe) is available on the [Releases](https://github.com/qlfu/grav-proxy/releases/latest) page (`SHA-256` for `v1.6.0`: `C4DE07CA099C81E10AACED65AE135C8E8361C042ABA9C7668C8971BD2D5A949C`).
+The standalone executable [`GravProxy.exe`](./GravProxy.exe) is available on the [Releases](https://github.com/qlfu/grav-proxy/releases/latest) page (`SHA-256` for `v1.7.0`: `4993A8307245E526FA3A5921CCB0BF8492D26ABCA7F5BC2623B5BDCFFB321CD4`).
 
 > Note: Installer and tray UI labels are currently in Russian; key menu items are noted below alongside their English meanings.
 
 <p align="center">
-  <img src="./docs/installer-ui.png" alt="GravProxy v1.6.0 Installer UI" width="760">
+  <img src="./docs/installer-ui.png" alt="GravProxy v1.7.0 Installer UI" width="760">
 </p>
 
 ---
@@ -35,6 +35,10 @@ The standalone executable [`GravProxy.exe`](./GravProxy.exe) is available on the
   - Finds keys or subscriptions from the **Happ** client (`subscription_log.txt`, Happ configs/registry) or user environment variables `AG_PROXY_VLESS` / `AG_PROXY_SUB_URL`.
   - Supports direct upstream `socks5://...` / `http://...` URIs (e.g., `socks5://127.0.0.1:10808` while Happ is running) and automatically falls back to Happ's local proxy if the subscription URL is blocked by an ISP.
   - Tests nodes through real `sing-box` against **Google GeoIP** (filtering out FakeIP and unsupported locations) and picks the fastest working node.
+- **Built-in SmartDNS mode (works without VPS/VPN)**:
+  - Toggle directly between **VLESS / Happ** and **SmartDNS (без VPN)** in the installer GUI or via `-SmartDns` / `-SmartDnsUrl` in CLI.
+  - Unlike system-wide DNS patchers (NRPT / `hosts`), DoH resolvers (`eu.geohide.ru`, `us.geohide.ru`, `dns.malw.link`, `dns.commonnet.work`, or your own DoH/DoT/IP) run **inside `sing-box`**, require **no admin privileges**, leave Windows system DNS untouched, and only resolve AI domains routed through `:28080` and PAC `:28081`.
+  - Includes live preset testing (**«Проверить DNS»**), automatic best-server selection, and tray auto-failover. *(Note: public SmartDNS/SNI proxies are inherently less reliable than a private VLESS node and may not cover every domain such as `v0.app`; `VLESS / Happ` remains the recommended mode for full stability.)*
 - **In-place patching without duplicates**:
   - Patches `agy.exe` and `language_server*.exe` in-place while storing original backups and a SHA-256 manifest in `%LOCALAPPDATA%\ag-proxy\backups\`.
   - Updates existing Antigravity and OpenCode shortcuts (Desktop, Start Menu, Taskbar) via self-checking launchers (`ag_launch.exe` / `oc_launch.exe`) while preserving original icons.
@@ -114,13 +118,19 @@ Passing any arguments starts [`GravProxy.exe`](./GravProxy.exe) in console mode:
 
 # Full uninstall and rollback
 .\GravProxy.exe -Uninstall
+
+# Install in SmartDNS mode (no VPS/VPN)
+.\GravProxy.exe -SmartDns
+.\GravProxy.exe -SmartDnsUrl "https://eu.geohide.ru/dns-query"
 ```
 
 | Flag | Description |
 | --- | --- |
 | `-TargetRoot <path>` | Install directory (default: `%LOCALAPPDATA%\ag-proxy`) |
-| `-VlessUrl <url>` | `vless://...`, `socks5://...`, `http://...`, or `https://...` subscription URL |
+| `-VlessUrl <url>` | `vless://...`, `socks5://...`, `http://...`, `smartdns://...`, or `https://...` subscription URL |
 | `-SubUrl <url>` | Subscription URL with automatic Google GeoIP clean-node selection |
+| `-SmartDns` | Enable no-VPN SmartDNS mode with automatic working-server selection |
+| `-SmartDnsUrl <url>` | Explicit SmartDNS (`auto`, `https://.../dns-query`, `tls://...`, IPv4) |
 | `-ClaudeApiKey <key>` | Claude Desktop API key (`sk-ant-...`, `sk-or-...`, or gateway key) |
 | `-ClaudeBaseUrl <url>` | Custom `inferenceGatewayBaseUrl` for Claude Desktop |
 | `-ClaudeAuthScheme <scheme>` | Gateway auth scheme: `bearer` (default) or `x-api-key` |
@@ -154,7 +164,7 @@ Passing any arguments starts [`GravProxy.exe`](./GravProxy.exe) in console mode:
 
 - **No embedded keys or telemetry**: see [SECURITY.md](./SECURITY.en.md) for local credential storage details, `SHA-256` verification, and details on the encrypted runtime container inside `GravProxy.exe`.
 - **Windows Defender SmartScreen**: `GravProxy.exe` is not signed with a commercial EV certificate, so Windows may show *"Windows protected your PC"* on first launch — click **More info → Run anyway** after verifying the `SHA-256` digest against the Releases page.
-- **Antivirus false positives (`Trojan:Win32/Sabsik.FL.A!ml`, `Wacatac.B!ml`, etc.)**: machine-learning/heuristic scanners in Windows Defender and third-party AV tools frequently flag unsigned single-file executables that decrypt an embedded resource (`GravProxy.pkg`) into `%TEMP%\ag-proxy-sfx-*`, invoke `csc.exe`, and register a local PAC proxy / `HKCU\...\Run` entry. Verify the file `SHA-256` against the GitHub Release (`v1.6.0`: `C4DE07CA099C81E10AACED65AE135C8E8361C042ABA9C7668C8971BD2D5A949C`) and add `GravProxy.exe` or `%LOCALAPPDATA%\ag-proxy` to Windows Security exclusions if Defender blocks it.
+- **Antivirus false positives (`Trojan:Win32/Sabsik.FL.A!ml`, `Wacatac.B!ml`, etc.)**: machine-learning/heuristic scanners in Windows Defender and third-party AV tools frequently flag unsigned single-file executables that decrypt an embedded resource (`GravProxy.pkg`) into `%TEMP%\ag-proxy-sfx-*`, invoke `csc.exe`, and register a local PAC proxy / `HKCU\...\Run` entry. Verify the file `SHA-256` against the GitHub Release (`v1.7.0`: `4993A8307245E526FA3A5921CCB0BF8492D26ABCA7F5BC2623B5BDCFFB321CD4`) and add `GravProxy.exe` or `%LOCALAPPDATA%\ag-proxy` to Windows Security exclusions if Defender blocks it.
 
 ---
 

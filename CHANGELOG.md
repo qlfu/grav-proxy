@@ -2,6 +2,14 @@
 
 **Русский** · [English](./CHANGELOG.en.md)
 
+## `v1.7.0`
+
+- **Режим SmartDNS (работа без VPS и без VPN) внутри `sing-box`**:
+  - В установщике ([`setup-ui.ps1`](./) / `GravProxy.exe`) и CLI (`-SmartDns`, `-SmartDnsUrl`) появился переключатель режима **`VLESS / Happ`** | **`SmartDNS (без VPN)`** с пресетами **`Авто`**, **`GeoHide EU`** (`eu.geohide.ru`), **`GeoHide US`** (`us.geohide.ru`), **`MalwDNS`** (`dns.malw.link`), **`CommonNet`** (`dns.commonnet.work`) и полем для своего DoH/DoT/IP.
+  - В отличие от системных DNS-патчеров, `sing-box` использует шифрованный DoH-резолвер (`domain_resolver`) только для AI-доменов на `:28080` и PAC `:28081` — **без прав администратора** и без изменения системного DNS Windows, `hosts` и NRPT.
+  - Добавлены живая проверка пресетов (**«Проверить DNS»**) через `sing-box`, отображение активного SmartDNS в трее (`proxy-tray.exe`), поддержка в `sing-box-bg.exe` (`-SkipTray`) и авто-failover на резервный SmartDNS при блокировке или сбое.
+- **Актуализация под `Antigravity 2.0`**: обновлены заголовки интерфейса, проверок и документации.
+
 ## `v1.6.0`
 
 - **Чистота каталога установки**: при установке и перепатче C#-исходники помощников (`sing-box-bg.cs`, `proxy-tray.cs`, `ag_launch.cs`, `oc_launch.cs`) больше не копируются в `%LOCALAPPDATA%\ag-proxy\`, а оставшиеся от старых версий `.cs`-файлы удаляются.
