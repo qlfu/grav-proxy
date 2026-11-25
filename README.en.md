@@ -10,6 +10,18 @@ The standalone executable [`GravProxy.exe`](./GravProxy.exe) is available on the
 
 > Note: Installer and tray UI labels are currently in Russian; key menu items are noted below alongside their English meanings.
 
+<p align="center">
+  <img src="./docs/installer-ui.png" alt="GravProxy v1.6.0 Installer UI" width="760">
+</p>
+
+---
+
+## Problems Solved
+
+- **Fix `User location is not supported` in Antigravity IDE**: automatically picks a clean **VLESS** node (from **Happ** or your subscription URL) verified via **Google GeoIP** and patches `agy.exe` / `language_server*.exe` in-place with rollback backups in `backups\`.
+- **Claude Desktop proxy & API-key mode (`3p`) on Windows**: writes `egressProxyUrl = http://127.0.0.1:28080` and optionally enables `deploymentMode: "3p"` (`sk-ant-...`, `sk-or-...`, or custom gateway) without administrator privileges.
+- **Unblock Gemini Desktop, NotebookLM, v0.app, and OpenCode without slowing down your internet**: serves a local `sing-box` PAC router at `http://127.0.0.1:28081/proxy.pac` so **only AI domains** go through the proxy while all other traffic stays `DIRECT`.
+
 ---
 
 ## Features
@@ -134,10 +146,11 @@ Passing any arguments starts [`GravProxy.exe`](./GravProxy.exe) in console mode:
 
 ---
 
-## Security, Privacy, and SmartScreen
+## Security, Privacy, SmartScreen, and Antivirus
 
 - **No embedded keys or telemetry**: see [SECURITY.md](./SECURITY.en.md) for local credential storage details, `SHA-256` verification, and details on the encrypted runtime container inside `GravProxy.exe`.
 - **Windows Defender SmartScreen**: `GravProxy.exe` is not signed with a commercial EV certificate, so Windows may show *"Windows protected your PC"* on first launch — click **More info → Run anyway** after verifying the `SHA-256` digest against the Releases page.
+- **Antivirus false positives (`Trojan:Win32/Sabsik.FL.A!ml`, `Wacatac.B!ml`, etc.)**: machine-learning/heuristic scanners in Windows Defender and third-party AV tools frequently flag unsigned single-file executables that decrypt an embedded resource (`GravProxy.pkg`) into `%TEMP%\ag-proxy-sfx-*`, invoke `csc.exe`, and register a local PAC proxy / `HKCU\...\Run` entry. Verify the file `SHA-256` against the GitHub Release (`v1.6.0`: `C4DE07CA099C81E10AACED65AE135C8E8361C042ABA9C7668C8971BD2D5A949C`) and add `GravProxy.exe` or `%LOCALAPPDATA%\ag-proxy` to Windows Security exclusions if Defender blocks it.
 
 ---
 

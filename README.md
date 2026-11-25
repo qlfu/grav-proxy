@@ -8,6 +8,20 @@
 
 Готовый автономный файл [`GravProxy.exe`](./GravProxy.exe) доступен на странице [Releases](https://github.com/qlfu/grav-proxy/releases/latest) (`SHA-256` для `v1.6.0`: `C4DE07CA099C81E10AACED65AE135C8E8361C042ABA9C7668C8971BD2D5A949C`).
 
+> **English summary:** Portable single-file `sing-box` VLESS/PAC proxy and in-place patcher for **Antigravity IDE** (fixes `User location is not supported`), **Claude Desktop** (`egressProxyUrl` + `3p` API-key mode without admin rights), **Gemini Desktop**, **NotebookLM**, **v0.app**, and **OpenCode** on Windows 10/11 x64. Only AI domains go through the proxy; regular traffic stays `DIRECT`. Full English guide: [README.en.md](./README.en.md).
+
+<p align="center">
+  <img src="./docs/installer-ui.png" alt="Интерфейс установщика GravProxy v1.6.0" width="760">
+</p>
+
+---
+
+## Какие проблемы решает
+
+- **Ошибка `User location is not supported` в Antigravity IDE**: автоматически подбирает чистый узел **VLESS** (из клиента **Happ** или по подписке) через **Google GeoIP** и патчит `agy.exe` / `language_server*.exe` на месте с откатом через `backups\`.
+- **Claude Desktop на Windows без входа или с блокировкой региона**: прописывает локальный прокси (`egressProxyUrl = http://127.0.0.1:28080`) и при указании API-ключа (`sk-ant-...`, `sk-or-...` / шлюз) включает режим `deploymentMode: "3p"` без прав администратора.
+- **Доступ к Gemini Desktop, NotebookLM, v0.app и OpenCode без торможения остального интернета**: поднимает локальный PAC-сервер `http://127.0.0.1:28081/proxy.pac` (`sing-box`), который направляет в прокси **только целевые AI-домены** — игры, YouTube, браузер и обычный трафик идут `DIRECT`.
+
 ---
 
 ## Возможности
@@ -132,10 +146,11 @@
 
 ---
 
-## Безопасность, приватность и SmartScreen
+## Безопасность, приватность, SmartScreen и антивирус
 
 - **Нет встроенных ключей и телеметрии**: подробности о хранении данных, проверке `SHA-256` и защите встроенного контейнера `GravProxy.exe` приведены в [SECURITY.md](./SECURITY.md).
 - **Windows Defender SmartScreen**: бинарник `GravProxy.exe` не подписан коммерческим EV-сертификатом, поэтому при первом запуске Windows может показать предупреждение *«Система Windows защитила ваш компьютер»* — нажмите **«Подробнее» → «Выполнить в любом случае»** (предварительно сверьте `SHA-256` файла со страницей Releases).
+- **Ложные срабатывания антивируса (`Trojan:Win32/Sabsik.FL.A!ml`, `Wacatac.B!ml` и др.)**: ML-движок Защитника Windows и некоторых антивирусов иногда помечает неподписанный однофайловый установщик с шифрованным ресурсом (`GravProxy.pkg`), распаковкой во временную папку `%TEMP%\ag-proxy-sfx-*` и сборкой вспомогательных лаунчеров через `csc.exe` эвристическими вердиктами класса `!ml`. Это ложное срабатывание (false positive). Сверьте `SHA-256` скачанного файла со значением из Releases (`v1.6.0`: `C4DE07CA099C81E10AACED65AE135C8E8361C042ABA9C7668C8971BD2D5A949C`) и при необходимости добавьте файл или папку `%LOCALAPPDATA%\ag-proxy` в исключения Безопасности Windows.
 
 ---
 
