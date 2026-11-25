@@ -133,7 +133,7 @@
 
 ## Безопасность, приватность и SmartScreen
 
-- **Нет встроенных ключей и телеметрии**: подробности о хранении данных и проверке хэша/ZIP-содержимого `GravProxy.exe` приведены в [SECURITY.ru.md](./SECURITY.md).
+- **Нет встроенных ключей и телеметрии**: подробности о хранении данных и проверке хэша/ZIP-содержимого `GravProxy.exe` приведены в [SECURITY.md](./SECURITY.md).
 - **Windows Defender SmartScreen**: бинарник `GravProxy.exe` не подписан коммерческим EV-сертификатом, поэтому при первом запуске Windows может показать предупреждение *«Система Windows защитила ваш компьютер»* — нажмите **«Подробнее» → «Выполнить в любом случае»** (предварительно можно сверить `SHA-256` и открыть `.exe` через 7-Zip).
 
 ---
@@ -163,6 +163,6 @@ Get-AppxPackage *Claude* | Select Name,Version; foreach($k in 'HKLM:\SOFTWARE\Po
 
 ## Документация и лицензия
 
-- История релизов: [CHANGELOG.ru.md](./CHANGELOG.md)
-- Безопасность и аудит сборки: [SECURITY.ru.md](./SECURITY.md)
+- История релизов: [CHANGELOG.md](./CHANGELOG.md)
+- Безопасность и аудит сборки: [SECURITY.md](./SECURITY.md)
 - Лицензия проекта: **MIT** ([LICENSE](./LICENSE)). В релизный бинарник включён компонент [`sing-box`](https://github.com/SagerNet/sing-box) (`v1.14.4`), распространяемый по лицензии **GPL-3.0-or-later**.
