@@ -12,9 +12,9 @@ All user credentials and runtime configurations are stored locally on your machi
 - Generated `sing-box` configuration — in `%LOCALAPPDATA%\ag-proxy\sing-box.json`.
 - Claude Desktop `3p` profile and API keys — in `%LOCALAPPDATA%\Claude-3p\configLibrary\` (including MSIX VFS `Packages\Claude_*\LocalCache\Local\Claude-3p`).
 
-## Integrity & Binary Audit (`GravProxy.exe`)
+## Integrity & Package Protection (`GravProxy.exe`)
 
-Before running `GravProxy.exe`, you can verify its checksum and inspect all bundled scripts without executing it:
+Before running `GravProxy.exe`, verify its checksum:
 
 1. **Verify SHA-256**:
 
@@ -22,28 +22,12 @@ Before running `GravProxy.exe`, you can verify its checksum and inspect all bund
 Get-FileHash .\GravProxy.exe -Algorithm SHA256
 ```
 
-Compare the output with the hash published on the [Releases](https://github.com/qlfu/grav-proxy/releases/latest) page (`v1.5.0`: `3A9A8992246DC81818ECB18706546D6BB0B72AABD92117177E804E734DE78E1A`).
+Compare the output with the hash published on the [Releases](https://github.com/qlfu/grav-proxy/releases/latest) page (`v1.6.0`: `C4DE07CA099C81E10AACED65AE135C8E8361C042ABA9C7668C8971BD2D5A949C`). The built-in auto-updater also verifies the downloaded `SHA-256` digest and `PE/EXE` header before launching updates.
 
-2. **Inspect the embedded ZIP bundle**:
+2. **Encrypted runtime container & disk footprint**:
 
-`GravProxy.exe` is a `.NET` launcher with an embedded ZIP archive (`GravProxy.bundle.zip`) containing the PowerShell scripts (`setup.ps1`, `setup-ui.ps1`, `happ-config.ps1`), C# source files (`payload\*.cs`), secret-free `payload\sing-box.json` template, and `payload\sing-box.exe`.
-
-You can open `GravProxy.exe` in 7-Zip or list/extract entries with built-in PowerShell/.NET APIs:
-
-```powershell
-Add-Type -AssemblyName System.IO.Compression.FileSystem
-$bytes = [IO.File]::ReadAllBytes('.\GravProxy.exe')
-for ($i = $bytes.Length - 22; $i -ge 0; $i--) {
-    if ($bytes[$i] -eq 0x50 -and $bytes[$i+1] -eq 0x4B -and $bytes[$i+2] -eq 0x05 -and $bytes[$i+3] -eq 0x06) {
-        $zipStart = $i - [BitConverter]::ToUInt32($bytes, $i + 16) - [BitConverter]::ToUInt32($bytes, $i + 12)
-        $ms = New-Object IO.MemoryStream($bytes, $zipStart, ($bytes.Length - $zipStart), $false)
-        $za = New-Object IO.Compression.ZipArchive($ms, 'Read')
-        $za.Entries | Select-Object FullName, Length
-        $za.Dispose(); $ms.Dispose()
-        break
-    }
-}
-```
+- Starting with `v1.6.0`, runtime components inside `GravProxy.exe` are stored in a custom binary container (`GravProxy.pkg`) compressed with raw `Deflate` and encrypted with per-build random `AES-256-CBC` + `HMAC-SHA256` keys. The executable contains no ZIP/archive headers and cannot be opened in 7-Zip, WinRAR, or `System.IO.Compression.ZipArchive`.
+- During installation, helper C# source files (`sing-box-bg.cs`, `proxy-tray.cs`, `ag_launch.cs`, `oc_launch.cs`) are no longer copied into `%LOCALAPPDATA%\ag-proxy\`, and any leftover `.cs` files from earlier versions are removed.
 
 ## Reporting Vulnerabilities
 

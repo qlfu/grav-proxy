@@ -2,11 +2,11 @@
 
 [Русский](./README.md) · **English**
 
-![Version](https://img.shields.io/badge/version-v1.5.0-blue) ![Platform](https://img.shields.io/badge/platform-Windows%2010%2F11%20x64-lightgrey) ![License](https://img.shields.io/badge/license-MIT-green)
+![Version](https://img.shields.io/badge/version-v1.6.0-blue) ![Platform](https://img.shields.io/badge/platform-Windows%2010%2F11%20x64-lightgrey) ![License](https://img.shields.io/badge/license-MIT-green)
 
 A portable, single-file local proxy (`127.0.0.1:28080`) and PAC router (`127.0.0.1:28081`) installer powered by `sing-box` (`1.14.4`, `windows/amd64`) for **Antigravity IDE**, **v0.app**, **Gemini Desktop**, **NotebookLM**, **OpenCode Desktop / CLI**, and **Claude Desktop** on Windows 10/11 x64.
 
-The standalone executable [`GravProxy.exe`](./GravProxy.exe) is available on the [Releases](https://github.com/qlfu/grav-proxy/releases/latest) page (`SHA-256` for `v1.5.0`: `3A9A8992246DC81818ECB18706546D6BB0B72AABD92117177E804E734DE78E1A`).
+The standalone executable [`GravProxy.exe`](./GravProxy.exe) is available on the [Releases](https://github.com/qlfu/grav-proxy/releases/latest) page (`SHA-256` for `v1.6.0`: `C4DE07CA099C81E10AACED65AE135C8E8361C042ABA9C7668C8971BD2D5A949C`).
 
 > Note: Installer and tray UI labels are currently in Russian; key menu items are noted below alongside their English meanings.
 
@@ -136,8 +136,8 @@ Passing any arguments starts [`GravProxy.exe`](./GravProxy.exe) in console mode:
 
 ## Security, Privacy, and SmartScreen
 
-- **No embedded keys or telemetry**: see [SECURITY.md](./SECURITY.en.md) for local credential storage details, `SHA-256` verification, and instructions to inspect the embedded ZIP bundle before running `GravProxy.exe`.
-- **Windows Defender SmartScreen**: `GravProxy.exe` is not signed with a commercial EV certificate, so Windows may show *"Windows protected your PC"* on first launch — click **More info → Run anyway** (you can verify the `SHA-256` hash and inspect the `.exe` contents in 7-Zip beforehand).
+- **No embedded keys or telemetry**: see [SECURITY.md](./SECURITY.en.md) for local credential storage details, `SHA-256` verification, and details on the encrypted runtime container inside `GravProxy.exe`.
+- **Windows Defender SmartScreen**: `GravProxy.exe` is not signed with a commercial EV certificate, so Windows may show *"Windows protected your PC"* on first launch — click **More info → Run anyway** after verifying the `SHA-256` digest against the Releases page.
 
 ---
 

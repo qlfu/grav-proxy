@@ -12,9 +12,9 @@
 - Итоговая конфигурация `sing-box` — в `%LOCALAPPDATA%\ag-proxy\sing-box.json`.
 - Профиль `3p` и API-ключи Claude Desktop — в `%LOCALAPPDATA%\Claude-3p\configLibrary\` (включая VFS-каталог MSIX `Packages\Claude_*\LocalCache\Local\Claude-3p`).
 
-## Проверка целостности и аудит `GravProxy.exe`
+## Проверка целостности и защита сборки (`GravProxy.exe`)
 
-Перед запуском вы можете проверить контрольную сумму и содержимое бинарника без его выполнения:
+Перед запуском проверяйте контрольную сумму бинарника:
 
 1. **Проверка SHA-256**:
 
@@ -22,28 +22,12 @@
 Get-FileHash .\GravProxy.exe -Algorithm SHA256
 ```
 
-Сравните полученное значение со значением на странице [Releases](https://github.com/qlfu/grav-proxy/releases/latest) (для `v1.5.0`: `3A9A8992246DC81818ECB18706546D6BB0B72AABD92117177E804E734DE78E1A`).
+Сравните полученное значение со значением на странице [Releases](https://github.com/qlfu/grav-proxy/releases/latest) (для `v1.6.0`: `C4DE07CA099C81E10AACED65AE135C8E8361C042ABA9C7668C8971BD2D5A949C`). Встроенный автообновитель также сверяет `SHA-256` и заголовок `PE/EXE` перед запуском новой версии.
 
-2. **Прозрачный аудит встроенных скриптов**:
+2. **Шифрованный контейнер и хранение файлов**:
 
-`GravProxy.exe` — это `.NET`-лаунчер со встроенным ZIP-архивом (`GravProxy.bundle.zip`). Внутри лежат исходные скрипты PowerShell (`setup.ps1`, `setup-ui.ps1`, `happ-config.ps1`), C#-код лаунчеров/трея (`payload\*.cs`), шаблон `payload\sing-box.json` без секретов и `payload\sing-box.exe`.
-
-Вы можете открыть `GravProxy.exe` через 7-Zip или просмотреть список/содержимое архива встроенными средствами .NET / PowerShell:
-
-```powershell
-Add-Type -AssemblyName System.IO.Compression.FileSystem
-$bytes = [IO.File]::ReadAllBytes('.\GravProxy.exe')
-for ($i = $bytes.Length - 22; $i -ge 0; $i--) {
-    if ($bytes[$i] -eq 0x50 -and $bytes[$i+1] -eq 0x4B -and $bytes[$i+2] -eq 0x05 -and $bytes[$i+3] -eq 0x06) {
-        $zipStart = $i - [BitConverter]::ToUInt32($bytes, $i + 16) - [BitConverter]::ToUInt32($bytes, $i + 12)
-        $ms = New-Object IO.MemoryStream($bytes, $zipStart, ($bytes.Length - $zipStart), $false)
-        $za = New-Object IO.Compression.ZipArchive($ms, 'Read')
-        $za.Entries | Select-Object FullName, Length
-        $za.Dispose(); $ms.Dispose()
-        break
-    }
-}
-```
+- Начиная с `v1.6.0`, внутренние компоненты `GravProxy.exe` упакованы в собственный бинарный контейнер `GravProxy.pkg`, сжатый `Deflate` и зашифрованный `AES-256-CBC` с контролем целостности `HMAC-SHA256` на случайных ключах сборки. Бинарник не содержит заголовков ZIP/архива и не открывается в 7-Zip, WinRAR или `System.IO.Compression.ZipArchive`.
+- При установке C#-исходники помощников (`sing-box-bg.cs`, `proxy-tray.cs`, `ag_launch.cs`, `oc_launch.cs`) больше не копируются в `%LOCALAPPDATA%\ag-proxy\`, а оставшиеся от старых версий `.cs`-файлы удаляются.
 
 ## Сообщение об уязвимостях
 

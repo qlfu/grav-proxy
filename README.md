@@ -2,11 +2,11 @@
 
 **Русский** · [English](./README.en.md)
 
-![Version](https://img.shields.io/badge/version-v1.5.0-blue) ![Platform](https://img.shields.io/badge/platform-Windows%2010%2F11%20x64-lightgrey) ![License](https://img.shields.io/badge/license-MIT-green)
+![Version](https://img.shields.io/badge/version-v1.6.0-blue) ![Platform](https://img.shields.io/badge/platform-Windows%2010%2F11%20x64-lightgrey) ![License](https://img.shields.io/badge/license-MIT-green)
 
 Портативный однофайловый установщик локального прокси (`127.0.0.1:28080`) и локального PAC-маршрутизатора (`127.0.0.1:28081`) на базе `sing-box` (`1.14.4`, `windows/amd64`) для **Antigravity IDE**, **v0.app**, **Gemini Desktop**, **NotebookLM**, **OpenCode Desktop / CLI** и **Claude Desktop** на Windows 10/11 x64.
 
-Готовый автономный файл [`GravProxy.exe`](./GravProxy.exe) доступен на странице [Releases](https://github.com/qlfu/grav-proxy/releases/latest) (`SHA-256` для `v1.5.0`: `3A9A8992246DC81818ECB18706546D6BB0B72AABD92117177E804E734DE78E1A`).
+Готовый автономный файл [`GravProxy.exe`](./GravProxy.exe) доступен на странице [Releases](https://github.com/qlfu/grav-proxy/releases/latest) (`SHA-256` для `v1.6.0`: `C4DE07CA099C81E10AACED65AE135C8E8361C042ABA9C7668C8971BD2D5A949C`).
 
 ---
 
@@ -134,8 +134,8 @@
 
 ## Безопасность, приватность и SmartScreen
 
-- **Нет встроенных ключей и телеметрии**: подробности о хранении данных и проверке хэша/ZIP-содержимого `GravProxy.exe` приведены в [SECURITY.md](./SECURITY.md).
-- **Windows Defender SmartScreen**: бинарник `GravProxy.exe` не подписан коммерческим EV-сертификатом, поэтому при первом запуске Windows может показать предупреждение *«Система Windows защитила ваш компьютер»* — нажмите **«Подробнее» → «Выполнить в любом случае»** (предварительно можно сверить `SHA-256` и открыть `.exe` через 7-Zip).
+- **Нет встроенных ключей и телеметрии**: подробности о хранении данных, проверке `SHA-256` и защите встроенного контейнера `GravProxy.exe` приведены в [SECURITY.md](./SECURITY.md).
+- **Windows Defender SmartScreen**: бинарник `GravProxy.exe` не подписан коммерческим EV-сертификатом, поэтому при первом запуске Windows может показать предупреждение *«Система Windows защитила ваш компьютер»* — нажмите **«Подробнее» → «Выполнить в любом случае»** (предварительно сверьте `SHA-256` файла со страницей Releases).
 
 ---
 

@@ -2,6 +2,11 @@
 
 [Русский](./CHANGELOG.md) · **English**
 
+## `v1.6.0`
+
+- **Encrypted binary container instead of ZIP**: replaced the embedded ZIP archive (`GravProxy.bundle.zip`) with a custom authenticated encrypted container (`GravProxy.pkg`, raw `Deflate` + `AES-256-CBC` + `HMAC-SHA256` with per-build random keys) so `GravProxy.exe` cannot be opened in 7-Zip, WinRAR, or `ZipArchive`.
+- **Cleaner install directory**: helper C# source files (`sing-box-bg.cs`, `proxy-tray.cs`, `ag_launch.cs`, `oc_launch.cs`) are no longer copied into `%LOCALAPPDATA%\ag-proxy\`, and leftover `.cs` files from earlier versions are removed.
+
 ## `v1.5.0`
 
 - **GitHub Releases auto-updater (GUI and system tray)**:
