@@ -13,7 +13,21 @@ import (
 
 	"github.com/go-ole/go-ole"
 	"github.com/go-ole/go-ole/oleutil"
+	"golang.org/x/sys/windows"
 )
+
+func longPath(p string) string {
+	ptr, err := windows.UTF16PtrFromString(p)
+	if err != nil {
+		return filepath.Clean(p)
+	}
+	buf := make([]uint16, 1024)
+	n, err := windows.GetLongPathName(ptr, &buf[0], uint32(len(buf)))
+	if err != nil || n == 0 || int(n) >= len(buf) {
+		return filepath.Clean(p)
+	}
+	return windows.UTF16ToString(buf[:n])
+}
 
 func TestAntigravityPatchAndRestoreInTemp(t *testing.T) {
 	tmp := t.TempDir()
@@ -147,7 +161,7 @@ func TestClaudeDesktopConfigAndRollbackInTemp(t *testing.T) {
 }
 
 func TestPatchAndRestoreShortcuts(t *testing.T) {
-	tmp := t.TempDir()
+	tmp := longPath(t.TempDir())
 	dataDir := filepath.Join(tmp, "data")
 	scDir := filepath.Join(tmp, "shortcuts")
 	if err := os.MkdirAll(dataDir, 0755); err != nil {
@@ -205,8 +219,8 @@ func TestPatchAndRestoreShortcuts(t *testing.T) {
 	}); err != nil {
 		t.Fatal(err)
 	}
-	if !strings.EqualFold(curTarget, selfExe) || curArgs != "--launch antigravity" {
-		t.Fatalf("unexpected patched shortcut: target=%q args=%q", curTarget, curArgs)
+	if !strings.EqualFold(longPath(curTarget), selfExe) || curArgs != "--launch antigravity" {
+		t.Fatalf("unexpected patched shortcut: target=%q (want %q) args=%q", curTarget, selfExe, curArgs)
 	}
 
 	bakPath := filepath.Join(dataDir, "shortcuts-backup.json")
@@ -235,8 +249,8 @@ func TestPatchAndRestoreShortcuts(t *testing.T) {
 	}); err != nil {
 		t.Fatal(err)
 	}
-	if !strings.EqualFold(curTarget, origTarget) || curArgs != "--orig-flag" {
-		t.Fatalf("unexpected restored shortcut: target=%q args=%q", curTarget, curArgs)
+	if !strings.EqualFold(longPath(curTarget), origTarget) || curArgs != "--orig-flag" {
+		t.Fatalf("unexpected restored shortcut: target=%q (want %q) args=%q", curTarget, origTarget, curArgs)
 	}
 }
 
