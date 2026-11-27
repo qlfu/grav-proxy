@@ -1139,6 +1139,9 @@ func DetectConflictingBypass() []string {
 			}
 		}
 	}
+	if IsHappTunAvailable() && IsHappSystemProxyEnabled() {
+		warnings = append(warnings, "В Happ включён System Proxy — при установке/перепатче GravProxy переведёт Happ в режим TUN для работы без конфликтов")
+	}
 	return warnings
 }
 

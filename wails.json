@@ -12,7 +12,7 @@
   "info": {
     "companyName": "GravProxy",
     "productName": "GravProxy",
-    "productVersion": "2.0.1",
+    "productVersion": "2.0.2",
     "copyright": "MIT License",
     "comments": "Local sing-box VLESS/PAC & SmartDNS proxy and patcher for AI tools on Windows"
   }

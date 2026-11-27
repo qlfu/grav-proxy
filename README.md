@@ -2,11 +2,11 @@
 
 **Русский** · [English](./README.en.md)
 
-![Version](https://img.shields.io/badge/version-v2.0.1-blue) ![Stack](https://img.shields.io/badge/Go%201.27%20%2B%20Wails%20v2-sing--box%201.14.4-00ADD8) ![Platform](https://img.shields.io/badge/platform-Windows%2010%2F11%20x64-lightgrey) ![License](https://img.shields.io/badge/license-MIT%20%2F%20GPL--3.0-green)
+![Version](https://img.shields.io/badge/version-v2.0.2-blue) ![Stack](https://img.shields.io/badge/Go%201.27%20%2B%20Wails%20v2-sing--box%201.14.4-00ADD8) ![Platform](https://img.shields.io/badge/platform-Windows%2010%2F11%20x64-lightgrey) ![License](https://img.shields.io/badge/license-MIT%20%2F%20GPL--3.0-green)
 
 Полностью открытый (**Open Source**) нативный однофайловый установщик локального прокси (`127.0.0.1:28080`) и PAC-маршрутизатора (`127.0.0.1:28081`) на **Go + Wails v2 (WebView2)** со встроенным в процесс ядром `sing-box` (`v1.14.4`, `CGO_ENABLED=0`, `windows/amd64`) для **Antigravity 2.0**, **v0.app**, **Gemini Desktop**, **NotebookLM**, **OpenCode Desktop / CLI** и **Claude Desktop** на Windows 10/11 x64 — с основным режимом **VLESS / Happ** и встроенным **SmartDNS (без VPN)**.
 
-Готовый бинарник `GravProxy.exe` доступен на странице [Releases](https://github.com/qlfu/grav-proxy/releases/latest) (`v2.0.1` SHA-256: `F02DD4E1081787BDB00EB57B373E63F3C97055B538194C2139FF9E57F8717FA9`, размер `41 053 696` байт).
+Готовый бинарник `GravProxy.exe` доступен на странице [Releases](https://github.com/qlfu/grav-proxy/releases/latest) (`v2.0.2` SHA-256: `942B2C7DA84259D94CACB98A399CACE5665871BD691437562EAC325790E5F8E0`, размер `41 070 592` байт).
 
 > **English summary:** Open-source native **Go + Wails v2 (WebView2)** single-binary installer and tray proxy controller with **in-process embedded `sing-box v1.14.4`** (zero external `.exe` downloads, zero PowerShell/C# compilation, zero temp unpacking) for **Antigravity 2.0**, **Claude Desktop** (`egressProxyUrl` + `3p` API-key mode), **Gemini Desktop**, **NotebookLM**, **v0.app**, and **OpenCode** on Windows 10/11 x64. Supports **VLESS / Happ** and a built-in **SmartDNS IP-Health Filtering Relay** (no VPN). Full English guide: [README.en.md](./README.en.md).
 

@@ -2,6 +2,18 @@
 
 [Русский](./CHANGELOG.md) · **English**
 
+## `v2.0.2` — Automatic Happ TUN-Only Mode & Clean Immediate Uninstall
+
+- **Automatic Happ TUN-only mode**:
+  - On install and repatch (when `HappService` / `happd.exe` is installed), automatically disables Happ's `System Proxy` (`systemProxy = "false"`), backs up original values to `happ-backup.json`, clears any stale WinINet loopback proxy, and restarts `Happ.exe --autostart` without stopping `happd.exe`.
+  - On **Uninstall**, restores Happ's original `systemProxy`/`tun` settings from `happ-backup.json`.
+  - `DetectConflictingBypass()` and `RunConnectivityTest()` specifically warn when `Happ System Proxy` is active.
+- **Clean immediate uninstall & installed-state fix**:
+  - When the GUI is launched from `AppData\Local\GravProxy\GravProxy.exe`, `Uninstall()` relocates its own executable to `%TEMP%` and deletes the entire `AppData\Local\GravProxy` directory immediately, cleaning up only the temp executable on window exit (with non-recursive `rmdir` as fallback).
+  - `GetInitialState()` no longer treats an orphaned `GravProxy.exe` without `config.json` as installed, fixing the false **"Installed (stopped)"** state after uninstall.
+
+---
+
 ## `v2.0.1` — Automatic Browser PAC Recovery After VPN Toggle & Legacy Autostart Cleanup
 
 - **Automatic system Browser PAC watchdog in the tray service**:

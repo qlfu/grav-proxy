@@ -28,6 +28,7 @@ type App struct {
 	selfExe           string
 	logFn             func(string)
 	pendingSelfDelete bool
+	cleanupTempExe    string
 }
 
 func NewApp(selfExe string) *App {
@@ -40,6 +41,13 @@ func (a *App) startup(ctx context.Context) {
 
 func (a *App) shutdown(ctx context.Context) {
 	patcher.RemoveGUIPidFile()
+	if a.cleanupTempExe != "" {
+		cmdLine := fmt.Sprintf(`ping 127.0.0.1 -n 2 >nul & del /f /q "%s"`, a.cleanupTempExe)
+		c := exec.Command("cmd.exe", "/c", cmdLine)
+		c.SysProcAttr = &syscall.SysProcAttr{HideWindow: true, CreationFlags: windows.CREATE_NO_WINDOW}
+		_ = c.Start()
+		return
+	}
 	if !a.pendingSelfDelete {
 		return
 	}
@@ -47,7 +55,7 @@ func (a *App) shutdown(ctx context.Context) {
 	if err != nil || dataDir == "" {
 		return
 	}
-	cmdLine := fmt.Sprintf(`ping 127.0.0.1 -n 3 >nul & del /f /q "%s" & rmdir /s /q "%s"`, a.selfExe, dataDir)
+	cmdLine := fmt.Sprintf(`ping 127.0.0.1 -n 2 >nul & del /f /q "%s" & rmdir "%s"`, a.selfExe, dataDir)
 	c := exec.Command("cmd.exe", "/c", cmdLine)
 	c.SysProcAttr = &syscall.SysProcAttr{HideWindow: true, CreationFlags: windows.CREATE_NO_WINDOW}
 	_ = c.Start()
@@ -97,15 +105,23 @@ type InitialState struct {
 	HappDiscovery  happ.HappDiscovery    `json:"happDiscovery"`
 }
 
+func isInstalledInDir(dataDir string, proxyOpen, pendingSelfDelete bool) bool {
+	if pendingSelfDelete {
+		return false
+	}
+	if proxyOpen {
+		return true
+	}
+	_, errCfg := os.Stat(filepath.Join(dataDir, config.ConfigFileName))
+	return errCfg == nil
+}
+
 func (a *App) GetInitialState() InitialState {
 	cfg, dataDir, _ := config.Load()
 	pOpen := isLoopbackOpen(cfg.ProxyPort, 200*time.Millisecond)
 	pacOpen := isLoopbackOpen(cfg.PACPort, 200*time.Millisecond)
 
-	installedExe := filepath.Join(dataDir, "GravProxy.exe")
-	_, errExe := os.Stat(installedExe)
-	_, errCfg := os.Stat(filepath.Join(dataDir, config.ConfigFileName))
-	installed := !a.pendingSelfDelete && (pOpen || errCfg == nil || (errExe == nil && !sameCleanPath(a.selfExe, installedExe)))
+	installed := isInstalledInDir(dataDir, pOpen, a.pendingSelfDelete)
 
 	shortDir := dataDir
 	if la := os.Getenv("LOCALAPPDATA"); la != "" && strings.HasPrefix(strings.ToLower(dataDir), strings.ToLower(la)) {
@@ -504,6 +520,14 @@ func (a *App) Install(req InstallRequest) ActionResult {
 		a.setStep("claude", "skip", "пропущено")
 	}
 
+	if req.BrowserPAC || req.Antigravity || req.OpenCode {
+		if changed, msg, err := patcher.ConfigureHappTunOnly(dataDir); err != nil {
+			a.log("  [WARN] Happ: " + err.Error())
+		} else if changed {
+			a.log("  [OK] " + msg)
+		}
+	}
+
 	pacStepOk := false
 	if req.BrowserPAC {
 		a.setProgress(88, "Регистрация Browser PAC...")
@@ -602,6 +626,13 @@ func (a *App) Repatch(req InstallRequest) ActionResult {
 			a.log("  [OK] " + msg)
 		}
 	}
+	if req.BrowserPAC || req.Antigravity || req.OpenCode {
+		if changed, msg, err := patcher.ConfigureHappTunOnly(dataDir); err != nil {
+			a.log("  [WARN] Happ: " + err.Error())
+		} else if changed {
+			a.log("  [OK] " + msg)
+		}
+	}
 	if req.BrowserPAC {
 		pacURL := pac.DefaultPACURL(cfg.PACPort)
 		if err := pac.EnableSystemPAC(pacURL, dataDir, cfg.PACPort); err != nil {
@@ -642,7 +673,11 @@ func (a *App) RunConnectivityTest() []engine.ConnectivityCheckItem {
 		if st.OurPACActive {
 			a.log(fmt.Sprintf("  [OK]   %-24s активен (%s)", "Browser PAC", pacURL))
 		} else if st.ExternalProxyActive {
-			a.log(fmt.Sprintf("  [WARN] %-24s переопределён внешним VPN/прокси", "Browser PAC"))
+			msg := "переопределён внешним VPN/прокси"
+			if patcher.IsHappTunAvailable() && patcher.IsHappSystemProxyEnabled() {
+				msg = "переопределён Happ System Proxy — нажмите «Перепатчить» для перевода Happ в TUN"
+			}
+			a.log(fmt.Sprintf("  [WARN] %-24s %s", "Browser PAC", msg))
 		} else if restored, err := pac.EnsureSystemPAC(pacURL, dataDir, cfg.PACPort); err != nil {
 			a.log(fmt.Sprintf("  [FAIL] %-24s %v", "Browser PAC", err))
 		} else if restored {
@@ -693,14 +728,26 @@ func (a *App) Uninstall() ActionResult {
 		a.log("  [OK] Очищены переменные среды AG_PROXY_*")
 	}
 	a.log("  [OK] Настройки OpenCode и Claude Desktop очищены")
+	if restored, err := patcher.RestoreHappSettings(dataDir); err == nil && restored {
+		a.log("  [OK] Настройки Happ (System Proxy / TUN) восстановлены")
+	}
 
 	issues := len(errs)
 	if dataDir != "" {
+		newSelf, moved := relocateSelfForUninstall(a.selfExe, dataDir)
+		if moved {
+			a.selfExe = newSelf
+			a.cleanupTempExe = newSelf
+		}
+		if wd, wdErr := os.Getwd(); wdErr == nil && isInsideDir(wd, dataDir) {
+			_ = os.Chdir(os.TempDir())
+		}
+
 		if isInsideDir(a.selfExe, dataDir) {
 			if entries, err := os.ReadDir(dataDir); err == nil {
 				for _, ent := range entries {
 					p := filepath.Join(dataDir, ent.Name())
-					if sameCleanPath(p, a.selfExe) {
+					if strings.EqualFold(filepath.Clean(p), filepath.Clean(a.selfExe)) {
 						continue
 					}
 					_ = os.RemoveAll(p)
@@ -748,11 +795,15 @@ func waitPortsClosed(proxyPort, pacPort int, maxWait time.Duration) bool {
 	}
 }
 
-func sameCleanPath(aPath, bPath string) bool {
-	if strings.TrimSpace(aPath) == "" || strings.TrimSpace(bPath) == "" {
-		return false
+func relocateSelfForUninstall(selfExe, dataDir string) (string, bool) {
+	if !isInsideDir(selfExe, dataDir) {
+		return selfExe, false
 	}
-	return strings.EqualFold(filepath.Clean(aPath), filepath.Clean(bPath))
+	tmpDel := filepath.Join(os.TempDir(), fmt.Sprintf("gravproxy-uninstalled-%d-%d.exe", os.Getpid(), time.Now().UnixNano()))
+	if err := os.Rename(selfExe, tmpDel); err == nil {
+		return tmpDel, true
+	}
+	return selfExe, false
 }
 
 func isInsideDir(child, parent string) bool {
